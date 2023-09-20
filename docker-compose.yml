@@ -1,0 +1,36 @@
+version: "3"
+services:
+  postgres:
+    container_name: pm-postgres
+    image: postgres:latest
+    ports:
+      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
+    volumes:
+      - /data/postgres:/data/postgres
+    networks:
+      - pm-postgres-network
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    restart: always
+
+  pgadmin:
+    container_name: pm-pgadmin
+    links:
+      - postgres:postgres
+    image: dpage/pgadmin4
+    ports:
+      - "${PG_ADMIN_INTERNAL_PORT}:${PG_ADMIN_EXTERNAL_PORT}"
+    volumes:
+      - /data/pgadmin:/root/.pgadmin
+    networks:
+      - pm-postgres-network
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PG_ADMIN_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PG_ADMIN_PASSWORD}
+    restart: always
+
+networks:
+  pm-postgres-network:
+    driver: bridge
