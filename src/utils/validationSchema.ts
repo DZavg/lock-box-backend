@@ -6,4 +6,6 @@ export default {
   POSTGRES_USER: Joi.string().required(),
   POSTGRES_PASSWORD: Joi.string().required(),
   POSTGRES_DB: Joi.string().required(),
+  POSTGRES_LOGGING: Joi.boolean().required(),
+  POSTGRES_SYNCHRONIZE: Joi.boolean().required(),
 };
