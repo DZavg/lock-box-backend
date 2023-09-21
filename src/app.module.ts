@@ -4,7 +4,8 @@ import { AppService } from '@/app.service';
 import { DatabaseModule } from '@/database/database.module';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
-import ValidationSchema from '@/helpers/validationSchema';
+import ValidationSchema from '@/utils/validationSchema';
+import { UsersModule } from '@/users/users.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import ValidationSchema from '@/helpers/validationSchema';
       validationSchema: Joi.object(ValidationSchema),
     }),
     DatabaseModule,
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
