@@ -9,7 +9,7 @@ import { Exclude } from 'class-transformer';
 
 @Entity('users')
 export class User {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({ type: 'bigint' })
   id: number;
 
   @Column({ unique: true })
