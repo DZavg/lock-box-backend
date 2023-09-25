@@ -24,8 +24,4 @@ export class User {
 
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
-
-  constructor(partial: Partial<User>) {
-    Object.assign(this, partial);
-  }
 }
