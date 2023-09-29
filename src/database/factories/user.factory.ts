@@ -7,7 +7,7 @@ export const UserFactory = async () => {
 
   const get = async () => {
     const user = new User();
-    user.email = faker.internet.email() + Math.floor(Math.random() * 10000);
+    user.email = faker.internet.email();
     user.password = hashPass;
 
     return user;
