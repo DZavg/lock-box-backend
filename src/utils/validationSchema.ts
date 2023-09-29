@@ -8,4 +8,8 @@ export default {
   POSTGRES_DB: Joi.string().required(),
   POSTGRES_LOGGING: Joi.boolean().required(),
   POSTGRES_SYNCHRONIZE: Joi.boolean().required(),
+  ACCESS_TOKEN_EXPIRATION: Joi.string().required(),
+  ACCESS_TOKEN_SECRET_KEY: Joi.string().required(),
+  REFRESH_TOKEN_EXPIRATION: Joi.string().required(),
+  REFRESH_TOKEN_SECRET_KEY: Joi.string().required(),
 };
