@@ -17,6 +17,7 @@ import PostgresErrorCodeEnum from '@/database/types/postgresErrorCode.enum';
 import { hashPassword } from '@/utils/password';
 import { UpdateUserDto } from '@/users/dto/update-user.dto';
 import { ApiTags } from '@nestjs/swagger';
+import { errorMessage } from '@/utils/errorMessage';
 
 @ApiTags('Users')
 @Controller('users')
@@ -35,12 +36,12 @@ export class UsersController {
     } catch (error) {
       if (error?.code === PostgresErrorCodeEnum.UniqueViolation) {
         throw new HttpException(
-          { error: 'Пользователь с таким email уже существует' },
+          { error: errorMessage.UserWithEmailExist },
           HttpStatus.BAD_REQUEST,
         );
       }
       throw new HttpException(
-        { error: 'Сервер не отвечает' },
+        { error: errorMessage.ServerError },
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
