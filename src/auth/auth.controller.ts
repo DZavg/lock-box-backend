@@ -10,10 +10,11 @@ import {
   Req,
   UseGuards,
   Patch,
+  Res,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { LoginDto } from '@/auth/dto/login.dto';
 import { UsersService } from '@/users/users.service';
 import PostgresErrorCodeEnum from '@/database/types/postgresErrorCode.enum';
@@ -21,13 +22,16 @@ import { JwtAuthGuard } from '@/auth/jwt-auth.guard';
 import { UpdateUserDto } from '@/users/dto/update-user.dto';
 import { hashPassword } from '@/utils/password';
 import { errorMessage } from '@/utils/errorMessage';
+import { SessionService } from '@/session/session.service';
 
 @ApiTags('Auth')
+@ApiBearerAuth()
 @Controller('auth')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly userService: UsersService,
+    private readonly sessionService: SessionService,
   ) {}
 
   @UseInterceptors(ClassSerializerInterceptor)
@@ -51,7 +55,7 @@ export class AuthController {
   }
 
   @Post('/login')
-  async login(@Body() loginDto: LoginDto) {
+  async login(@Body() loginDto: LoginDto, @Res() response) {
     const equalsPass = await this.authService.comparePassword(loginDto);
     if (!equalsPass) {
       throw new HttpException(
@@ -61,12 +65,15 @@ export class AuthController {
     }
 
     const user = await this.userService.findOneByEmail(loginDto.email);
-    return await this.authService.generateTokens(user);
+    return response
+      .status(HttpStatus.OK)
+      .send(await this.sessionService.generateTokens(user));
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('/profile')
   getProfile(@Req() req) {
+    delete req.user.accessToken;
     return req.user;
   }
 
@@ -82,6 +89,6 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Post('/logout')
   async logout(@Req() req) {
-    return 'success';
+    return this.authService.logout(req.user);
   }
 }

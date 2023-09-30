@@ -2,7 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { User } from '@/users/entities/user.entity';
 import { UsersService } from '@/users/users.service';
 import { comparePassword } from '@/utils/password';
-import { JwtService } from '@nestjs/jwt';
+import { SessionService } from '@/session/session.service';
+import { IUser } from '@/auth/jwt.strategy';
 
 interface comparePasswordDTO {
   email: string;
@@ -13,10 +14,12 @@ interface comparePasswordDTO {
 export class AuthService {
   constructor(
     private userService: UsersService,
-    private jwtService: JwtService,
+    private sessionService: SessionService,
   ) {}
 
-  async registration(user: User) {}
+  async registration(user: User) {
+    return { message: 'Пользователь успешно зарегистрирован' };
+  }
 
   async comparePassword(userDto: comparePasswordDTO) {
     const user = await this.userService.findOneByEmail(userDto.email);
@@ -24,10 +27,8 @@ export class AuthService {
     return await comparePassword(userDto.password || '', user.password);
   }
 
-  async generateTokens(user: User) {
-    const payload = { id: user.id };
-    return {
-      access_token: await this.jwtService.signAsync(payload),
-    };
+  async logout(user: IUser) {
+    return 'true';
+    // return await this.sessionService.revokeAccessToken(user.accessToken);
   }
 }
