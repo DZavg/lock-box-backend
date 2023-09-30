@@ -27,7 +27,7 @@ export class AuthService {
   }
 
   async logout(user: any) {
-    return 'true';
-    // return await this.sessionService.revokeAccessToken(user.accessToken);
+    await this.sessionService.revokeAccessToken(user.accessToken);
+    return { message: 'success' };
   }
 }

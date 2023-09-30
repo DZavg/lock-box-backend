@@ -10,6 +10,7 @@ import {
   Req,
   Patch,
   Res,
+  UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
@@ -21,6 +22,7 @@ import { UpdateUserDto } from '@/users/dto/update-user.dto';
 import { hashPassword } from '@/utils/password';
 import { errorMessage } from '@/utils/errorMessage';
 import { SessionService } from '@/session/session.service';
+import { AuthGuard } from '@/auth/auth.guard';
 
 @ApiTags('Auth')
 @ApiBearerAuth()
@@ -68,12 +70,16 @@ export class AuthController {
       .send(await this.sessionService.generateTokens(user));
   }
 
+  @UseGuards(AuthGuard)
   @Get('/profile')
   getProfile(@Req() req) {
     delete req.user.accessToken;
+    delete req.user.createdAt;
+    delete req.user.updatedAt;
     return req.user;
   }
 
+  @UseGuards(AuthGuard)
   @Patch('/profile')
   async update(@Req() req, @Body() updateUserDto: UpdateUserDto) {
     if (updateUserDto.password) {
@@ -82,6 +88,7 @@ export class AuthController {
     return this.userService.update(req.user.id, updateUserDto);
   }
 
+  @UseGuards(AuthGuard)
   @Post('/logout')
   async logout(@Req() req) {
     return this.authService.logout(req.user);
