@@ -5,5 +5,6 @@ export const errorMessage = {
   ServerError: 'Сервер не отвечает',
   LoginError: 'Почта или пароль неверный',
   UserWithEmailExist: 'Пользователь с таким email уже существует',
+  Unauthorized: 'Доступ запрещен',
   Length: (min, max) => `Поле должно быть от ${min} до ${max} символов`,
 };
