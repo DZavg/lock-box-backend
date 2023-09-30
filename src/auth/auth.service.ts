@@ -3,7 +3,6 @@ import { User } from '@/users/entities/user.entity';
 import { UsersService } from '@/users/users.service';
 import { comparePassword } from '@/utils/password';
 import { SessionService } from '@/session/session.service';
-import { IUser } from '@/auth/jwt.strategy';
 
 interface comparePasswordDTO {
   email: string;
@@ -27,7 +26,7 @@ export class AuthService {
     return await comparePassword(userDto.password || '', user.password);
   }
 
-  async logout(user: IUser) {
+  async logout(user: any) {
     return 'true';
     // return await this.sessionService.revokeAccessToken(user.accessToken);
   }

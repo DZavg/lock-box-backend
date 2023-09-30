@@ -8,7 +8,6 @@ import {
   HttpStatus,
   Get,
   Req,
-  UseGuards,
   Patch,
   Res,
 } from '@nestjs/common';
@@ -18,7 +17,6 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { LoginDto } from '@/auth/dto/login.dto';
 import { UsersService } from '@/users/users.service';
 import PostgresErrorCodeEnum from '@/database/types/postgresErrorCode.enum';
-import { JwtAuthGuard } from '@/auth/jwt-auth.guard';
 import { UpdateUserDto } from '@/users/dto/update-user.dto';
 import { hashPassword } from '@/utils/password';
 import { errorMessage } from '@/utils/errorMessage';
@@ -70,14 +68,12 @@ export class AuthController {
       .send(await this.sessionService.generateTokens(user));
   }
 
-  @UseGuards(JwtAuthGuard)
   @Get('/profile')
   getProfile(@Req() req) {
     delete req.user.accessToken;
     return req.user;
   }
 
-  @UseGuards(JwtAuthGuard)
   @Patch('/profile')
   async update(@Req() req, @Body() updateUserDto: UpdateUserDto) {
     if (updateUserDto.password) {
@@ -86,7 +82,6 @@ export class AuthController {
     return this.userService.update(req.user.id, updateUserDto);
   }
 
-  @UseGuards(JwtAuthGuard)
   @Post('/logout')
   async logout(@Req() req) {
     return this.authService.logout(req.user);
