@@ -1,13 +1,13 @@
 import { Module } from '@nestjs/common';
 import { SessionService } from './session.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { accessToken } from '@/session/entities/accessToken.entity';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
+import { Session } from '@/session/entities/session.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([accessToken]),
+    TypeOrmModule.forFeature([Session]),
     ConfigModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],

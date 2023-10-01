@@ -5,19 +5,22 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
-@Entity('access_tokens')
-export class accessToken {
+@Entity('session')
+export class Session {
   @PrimaryGeneratedColumn('uuid')
   id: number;
 
-  @Column()
-  token: string;
+  @Column({ name: 'access_token' })
+  accessToken: string;
+
+  @Column({ name: 'refresh_token', nullable: true })
+  refreshToken: string;
 
   @Column({ type: 'boolean' })
   revoked: boolean;
 
-  @Column()
-  expiredAt: string;
+  @Column({ name: 'expired_at' })
+  expiredAt: Date;
 
   @Column({ name: 'user_id', type: 'bigint' })
   userId: number;

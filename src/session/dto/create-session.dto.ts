@@ -1,8 +1,10 @@
 import { IsOptional } from 'class-validator';
 
-export class CreateAccessTokenDto {
+export class CreateSessionDto {
   expiredAt: string;
-  token: string;
+  accessToken: string;
+  @IsOptional()
+  refreshToken?: string;
   userId: number;
   @IsOptional()
   revoked?: boolean = false;

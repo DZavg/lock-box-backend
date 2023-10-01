@@ -1,39 +1,39 @@
 import { Injectable } from '@nestjs/common';
-import { CreateAccessTokenDto } from './dto/create-access-token.dto';
+import { CreateSessionDto } from './dto/create-session.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { accessToken } from '@/session/entities/accessToken.entity';
 import { Repository } from 'typeorm';
 import { User } from '@/users/entities/user.entity';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { Session } from '@/session/entities/session.entity';
 
 @Injectable()
 export class SessionService {
   constructor(
-    @InjectRepository(accessToken)
-    private readonly accessTokenRepository: Repository<accessToken>,
+    @InjectRepository(Session)
+    private readonly sessionRepository: Repository<Session>,
     private jwtService: JwtService,
     private configService: ConfigService,
   ) {}
 
-  async saveAccessToken(createAccessTokenDto: CreateAccessTokenDto) {
+  async saveTokens(createAccessTokenDto: CreateSessionDto) {
     const accessToken =
-      await this.accessTokenRepository.create(createAccessTokenDto);
-    await this.accessTokenRepository.save(accessToken);
+      await this.sessionRepository.create(createAccessTokenDto);
+    await this.sessionRepository.save(accessToken);
     return accessToken;
   }
 
-  async findAccessToken(token: string) {
-    return await this.accessTokenRepository.findOneBy({ token });
+  async findByAccessToken(accessToken: string) {
+    return await this.sessionRepository.findOneBy({ accessToken });
   }
 
-  async deleteAccessToken(token: string) {
-    return await this.accessTokenRepository.delete(token);
+  async deleteByAccessToken(token: string) {
+    return await this.sessionRepository.delete(token);
   }
 
-  async revokeAccessToken(token: string) {
-    return await this.accessTokenRepository.update(
-      { token },
+  async revokeToken(accessToken: string) {
+    return await this.sessionRepository.update(
+      { accessToken },
       { revoked: true },
     );
   }
@@ -46,8 +46,8 @@ export class SessionService {
     ).toISOString();
     const accessToken = await this.jwtService.signAsync(payload);
 
-    await this.saveAccessToken({
-      token: accessToken,
+    await this.saveTokens({
+      accessToken: accessToken,
       expiredAt: expiredAccessToken,
       userId: user.id,
       revoked: false,
