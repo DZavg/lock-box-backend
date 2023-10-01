@@ -1,10 +1,11 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { User } from '@/users/entities/user.entity';
 import { UsersService } from '@/users/users.service';
-import { comparePassword } from '@/utils/password';
+import { comparePassword, hashPassword } from '@/utils/password';
 import { SessionService } from '@/session/session.service';
 import { LoginDto } from '@/auth/dto/login.dto';
 import { errorMessage } from '@/utils/errorMessage';
+import { RegisterDto } from '@/auth/dto/register.dto';
+import { UpdateUserDto } from '@/users/dto/update-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -13,7 +14,8 @@ export class AuthService {
     private sessionService: SessionService,
   ) {}
 
-  async registration(user: User) {
+  async registration(registerDto: RegisterDto) {
+    await this.userService.create(registerDto);
     return { message: 'Пользователь успешно зарегистрирован' };
   }
 
@@ -35,8 +37,16 @@ export class AuthService {
     return await this.sessionService.generateTokens(user);
   }
 
-  async logout(user: any) {
-    await this.sessionService.revokeAccessToken(user.accessToken);
+  async update(userId: number, updateUserDto: UpdateUserDto) {
+    if (updateUserDto.password) {
+      updateUserDto.password = await hashPassword(updateUserDto.password);
+    }
+    return await this.userService.update(userId, updateUserDto);
+  }
+
+  async logout(accessToken: string) {
+    console.log(accessToken);
+    await this.sessionService.revokeAccessToken(accessToken);
     return { message: 'success' };
   }
 }
