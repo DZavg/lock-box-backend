@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { UsersService } from '@/users/users.service';
-import { comparePassword, hashPassword } from '@/utils/password';
+import { compareString, hashString } from '@/utils/hash';
 import { SessionService } from '@/session/session.service';
 import { LoginDto } from '@/auth/dto/login.dto';
 import { errorMessage } from '@/utils/errorMessage';
@@ -22,7 +22,7 @@ export class AuthService {
   async login(loginDto: LoginDto) {
     const user = await this.userService.findOneByEmail(loginDto.email);
 
-    const equalsPass = await comparePassword(
+    const equalsPass = await compareString(
       loginDto.password || '',
       user.password,
     );
@@ -39,7 +39,7 @@ export class AuthService {
 
   async update(userId: number, updateUserDto: UpdateUserDto) {
     if (updateUserDto.password) {
-      updateUserDto.password = await hashPassword(updateUserDto.password);
+      updateUserDto.password = await hashString(updateUserDto.password);
     }
     return await this.userService.update(userId, updateUserDto);
   }

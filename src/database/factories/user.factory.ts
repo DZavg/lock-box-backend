@@ -1,9 +1,9 @@
 import { User } from '../../users/entities/user.entity';
 import { faker } from '@faker-js/faker';
-import { hashPassword } from '../../utils/password';
+import { hashString } from '../../utils/hash';
 
 export const UserFactory = async () => {
-  const hashPass = await hashPassword('123456');
+  const hashPass = await hashString('123456');
 
   const get = async () => {
     const user = new User();
