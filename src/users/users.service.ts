@@ -38,12 +38,15 @@ export class UsersService {
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) {
+    if (updateUserDto.password) {
+      updateUserDto.password = await hashString(updateUserDto.password);
+    }
     await this.usersRepository.update({ id }, updateUserDto);
     return this.findOneById(id);
   }
 
   async remove(id: number) {
     await this.usersRepository.delete(id);
-    return this.findAll();
+    return { message: 'success' };
   }
 }

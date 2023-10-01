@@ -11,8 +11,7 @@ import {
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { hashString } from '@/utils/hash';
-import { UpdateUserDto } from '@/users/dto/update-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Users')
@@ -38,9 +37,6 @@ export class UsersController {
 
   @Patch(':id')
   async update(@Param('id') id: number, @Body() updateUserDto: UpdateUserDto) {
-    if (updateUserDto.password) {
-      updateUserDto.password = await hashString(updateUserDto.password);
-    }
     return this.usersService.update(+id, updateUserDto);
   }
 
