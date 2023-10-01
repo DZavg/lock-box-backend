@@ -1,16 +1,10 @@
-import {
-  CanActivate,
-  ExecutionContext,
-  HttpException,
-  HttpStatus,
-  Injectable,
-} from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { ConfigService } from '@nestjs/config';
 import { UsersService } from '@/users/users.service';
 import { SessionService } from '@/session/session.service';
-import { errorMessage } from '@/utils/errorMessage';
+import { UnauthorizedException } from '@/utils/exception/unauthorizedException';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -24,30 +18,25 @@ export class AuthGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     const accessToken = this.extractTokenFromHeader(request);
+    const user = await this.verifyToken(accessToken);
 
-    if (await this.accessTokenIsRevoked(accessToken)) {
-      throw this.unauthorizedException();
+    if ((await this.accessTokenIsRevoked(accessToken)) || !user) {
+      throw new UnauthorizedException();
     }
 
-    try {
-      const { id } = await this.jwtService.verifyAsync(accessToken, {
-        secret: this.configService.get('ACCESS_TOKEN_SECRET_KEY'),
-      });
+    request['user'] = user;
 
-      const user = await this.usersService.findOneById(id);
-      user['accessToken'] = accessToken;
-      request['user'] = user;
-    } catch {
-      throw this.unauthorizedException();
-    }
     return true;
   }
 
-  private unauthorizedException(): HttpException {
-    return new HttpException(
-      { error: errorMessage.Unauthorized },
-      HttpStatus.UNAUTHORIZED,
-    );
+  private async verifyToken(accessToken) {
+    const { id } = await this.jwtService.verifyAsync(accessToken, {
+      secret: this.configService.get('ACCESS_TOKEN_SECRET_KEY'),
+    });
+
+    const user = await this.usersService.findOneById(id);
+    user['accessToken'] = accessToken;
+    return user;
   }
 
   private async accessTokenIsRevoked(token): Promise<boolean> {
