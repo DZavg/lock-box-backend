@@ -7,6 +7,7 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import swaggerDocs from '@/utils/swaggerDocs';
+import { useContainer } from 'class-validator';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -28,6 +29,9 @@ async function bootstrap() {
 
   const document = SwaggerModule.createDocument(app, swaggerDocs);
   SwaggerModule.setup('api', app, document);
+
+  useContainer(app.select(AppModule), { fallbackOnErrors: true });
+
   await app.listen(5001);
 }
 bootstrap();
