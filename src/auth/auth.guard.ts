@@ -24,7 +24,8 @@ export class AuthGuard implements CanActivate {
       throw new UnauthorizedException();
     }
 
-    request['user'] = user;
+    request.user = user;
+    request.accessToken = accessToken;
 
     return true;
   }
@@ -34,9 +35,7 @@ export class AuthGuard implements CanActivate {
       secret: this.configService.get('ACCESS_TOKEN_SECRET_KEY'),
     });
 
-    const user = await this.usersService.findOneById(id);
-    user['accessToken'] = accessToken;
-    return user;
+    return await this.usersService.findOneById(id);
   }
 
   private async accessTokenIsRevoked(token): Promise<boolean> {
