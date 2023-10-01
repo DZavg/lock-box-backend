@@ -31,15 +31,19 @@ export class AuthGuard implements CanActivate {
   }
 
   private async verifyToken(accessToken) {
-    const { id } = await this.jwtService.verifyAsync(accessToken, {
-      secret: this.configService.get('ACCESS_TOKEN_SECRET_KEY'),
-    });
+    try {
+      const { id } = await this.jwtService.verifyAsync(accessToken, {
+        secret: this.configService.get('ACCESS_TOKEN_SECRET_KEY'),
+      });
 
-    return await this.usersService.findOneById(id);
+      return await this.usersService.findOneById(id);
+    } catch (e) {
+      throw new UnauthorizedException();
+    }
   }
 
   private async accessTokenIsRevoked(token): Promise<boolean> {
-    const accessToken = await this.sessionService.findAccessToken(token);
+    const accessToken = await this.sessionService.findByAccessToken(token);
     return !token || !accessToken || accessToken.revoked;
   }
 
