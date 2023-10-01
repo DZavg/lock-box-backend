@@ -9,7 +9,6 @@ import {
   Get,
   Req,
   Patch,
-  Res,
   UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
@@ -21,7 +20,6 @@ import PostgresErrorCodeEnum from '@/database/types/postgresErrorCode.enum';
 import { UpdateUserDto } from '@/users/dto/update-user.dto';
 import { hashPassword } from '@/utils/password';
 import { errorMessage } from '@/utils/errorMessage';
-import { SessionService } from '@/session/session.service';
 import { AuthGuard } from '@/auth/auth.guard';
 
 @ApiTags('Auth')
@@ -31,7 +29,6 @@ export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly userService: UsersService,
-    private readonly sessionService: SessionService,
   ) {}
 
   @UseInterceptors(ClassSerializerInterceptor)
@@ -55,19 +52,8 @@ export class AuthController {
   }
 
   @Post('/login')
-  async login(@Body() loginDto: LoginDto, @Res() response) {
-    const equalsPass = await this.authService.comparePassword(loginDto);
-    if (!equalsPass) {
-      throw new HttpException(
-        { error: errorMessage.LoginError },
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-
-    const user = await this.userService.findOneByEmail(loginDto.email);
-    return response
-      .status(HttpStatus.OK)
-      .send(await this.sessionService.generateTokens(user));
+  async login(@Body() loginDto: LoginDto) {
+    return this.authService.login(loginDto);
   }
 
   @UseGuards(AuthGuard)
