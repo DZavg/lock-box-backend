@@ -14,4 +14,8 @@ export class RegisterDto {
   @IsString({ message: errorMessage.IsString })
   @Length(6, 30, { message: errorMessage.Length(6, 30) })
   password: string;
+
+  @IsString({ message: errorMessage.IsString })
+  @Length(2, 15, { message: errorMessage.Length(2, 30) })
+  username: string;
 }

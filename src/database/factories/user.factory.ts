@@ -8,6 +8,7 @@ export const UserFactory = async () => {
   const get = async () => {
     const user = new User();
     user.email = faker.internet.email();
+    user.username = faker.internet.userName();
     user.password = hashPass;
 
     return user;
