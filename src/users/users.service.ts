@@ -42,7 +42,7 @@ export class UsersService {
       updateUserDto.password = await hashString(updateUserDto.password);
     }
     await this.usersRepository.update({ id }, updateUserDto);
-    return this.findOneById(id);
+    return await this.findOneById(id);
   }
 
   async remove(id: number) {
