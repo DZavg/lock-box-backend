@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from '@/users/entities/user.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UpdateUserDto } from '@/users/dto/update-user.dto';
 import { hashString } from '@/utils/hash';
+import { errorMessage } from '@/utils/errorMessage';
 
 @Injectable()
 export class UsersService {
@@ -27,7 +28,14 @@ export class UsersService {
   }
 
   async findOneById(id: number) {
-    return await this.usersRepository.findOneBy({ id });
+    const user = await this.usersRepository.findOneBy({ id });
+    if (!user) {
+      throw new HttpException(
+        { error: errorMessage.UserNotFound },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    return user;
   }
 
   async findOneByEmail(email: string) {
