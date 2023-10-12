@@ -111,20 +111,23 @@ describe('Users', () => {
           expect(res.body.errors).toHaveProperty('email');
           expect(res.body.errors).toHaveProperty('password');
           expect(res.body.errors).toHaveProperty('username');
-          expect(res.body.errors.email).toEqual([
-            errorMessage.IsEmail,
-            errorMessage.IsString,
-            errorMessage.IsNotEmpty,
-          ]);
-          expect(res.body.errors.password).toEqual([
-            errorMessage.Length(6, 30),
-            errorMessage.IsString,
-            errorMessage.IsNotEmpty,
-          ]);
-          expect(res.body.errors.username).toEqual([
-            errorMessage.Length(2, 30),
-            errorMessage.IsString,
-          ]);
+          expect(res.body.errors.email.sort()).toEqual(
+            [
+              errorMessage.IsEmail,
+              errorMessage.IsString,
+              errorMessage.IsNotEmpty,
+            ].sort(),
+          );
+          expect(res.body.errors.password.sort()).toEqual(
+            [
+              errorMessage.Length(6, 30),
+              errorMessage.IsString,
+              errorMessage.IsNotEmpty,
+            ].sort(),
+          );
+          expect(res.body.errors.username.sort()).toEqual(
+            [errorMessage.Length(2, 30), errorMessage.IsString].sort(),
+          );
         });
     });
   });
