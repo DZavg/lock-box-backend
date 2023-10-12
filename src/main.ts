@@ -27,6 +27,8 @@ async function bootstrap() {
     }),
   );
 
+  app.setGlobalPrefix('api');
+
   const document = SwaggerModule.createDocument(app, swaggerDocs);
   SwaggerModule.setup('api', app, document);
 
