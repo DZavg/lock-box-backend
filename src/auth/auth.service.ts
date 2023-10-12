@@ -24,7 +24,7 @@ export class AuthService {
 
     const equalsPass = await compareString(
       loginDto.password || '',
-      user.password,
+      user?.password,
     );
 
     if (!equalsPass) {
