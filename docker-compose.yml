@@ -15,6 +15,16 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
     restart: always
 
+  db-test:
+    image: postgres:latest
+    ports:
+      - "${POSTGRES_TEST_PORT}:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_TEST_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_TEST_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_TEST_DB}
+    restart: always
+
   pgadmin:
     container_name: pm-pgadmin
     links:
