@@ -10,5 +10,6 @@ export const compareString = async (
   string: string,
   hash: string,
 ): Promise<boolean> => {
+  if (!string || !hash) return false;
   return await compare(string, hash);
 };
