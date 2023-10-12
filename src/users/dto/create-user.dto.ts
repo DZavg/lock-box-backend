@@ -16,7 +16,7 @@ export class CreateUserDto {
   password: string;
 
   @IsString({ message: errorMessage.IsString })
-  @Length(2, 15, { message: errorMessage.Length(2, 30) })
+  @Length(2, 30, { message: errorMessage.Length(2, 30) })
   username: string;
 
   constructor(partial: Partial<User> = {}) {
