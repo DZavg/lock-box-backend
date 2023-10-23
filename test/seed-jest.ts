@@ -4,22 +4,31 @@ import { UsersService } from '@/users/users.service';
 import { LoginDto } from '@/auth/dto/login.dto';
 import * as request from 'supertest';
 
-export const seedAdminUser = async (
-  app: INestApplication,
-): Promise<{ adminUser: any; authTokenForAdmin: any }> => {
-  const defaultAdmin: CreateUserDto = {
-    username: 'default-admin',
-    password: 'default-admin-password',
-    email: 'default-admin@example.com',
-  };
+const defaultAdmin: CreateUserDto = {
+  username: 'default-admin',
+  password: 'default-admin-password',
+  email: 'default-admin@example.com',
+};
 
+const defaultUser: CreateUserDto = {
+  username: 'default-user',
+  password: 'default-user-password',
+  email: 'default-user@example.com',
+};
+
+const loginInput: LoginDto = {
+  email: defaultAdmin.email,
+  password: defaultAdmin.password,
+};
+
+const seedAdminUser = async (
+  app: INestApplication,
+): Promise<{
+  adminUser: any;
+  authTokenForAdmin: any;
+}> => {
   const usersService = app.get(UsersService);
   const userOutput = await usersService.create(defaultAdmin);
-
-  const loginInput: LoginDto = {
-    email: defaultAdmin.email,
-    password: defaultAdmin.password,
-  };
 
   const loginResponse = await request(app.getHttpServer())
     .post('/auth/login')
@@ -32,3 +41,5 @@ export const seedAdminUser = async (
 
   return { adminUser, authTokenForAdmin };
 };
+
+export { seedAdminUser, loginInput, defaultAdmin, defaultUser };

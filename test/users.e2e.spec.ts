@@ -7,14 +7,18 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { AppModule } from '@/app.module';
-import { seedAdminUser } from './seed-jest';
+import { defaultAdmin, defaultUser, seedAdminUser } from './seed-jest';
 import { useContainer } from 'class-validator';
 import { errorMessage } from '@/utils/errorMessage';
 import { UpdateUserDto } from '@/users/dto/update-user.dto';
+import { DataSource } from 'typeorm';
+import { User } from '@/users/entities/user.entity';
 
 describe('Users', () => {
   let app: INestApplication;
   let adminUser;
+  let dataSource;
+  let userRepository;
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -41,22 +45,24 @@ describe('Users', () => {
 
     useContainer(app.select(AppModule), { fallbackOnErrors: true });
 
+    dataSource = moduleRef.get<DataSource>(DataSource);
+
+    userRepository = dataSource.getRepository(User);
+
     await app.init();
-    ({ adminUser } = await seedAdminUser(app));
   });
 
   afterAll(async () => {
     await app.close();
   });
 
+  beforeEach(async () => {
+    await userRepository.remove(await userRepository.find());
+  });
+
   it(`/GET all users`, () => {
-    const expectedUsers = [
-      {
-        id: adminUser.id,
-        email: adminUser.email,
-        username: adminUser.username,
-      },
-    ];
+    const expectedUsers = [];
+
     return request(app.getHttpServer())
       .get('/users')
       .expect(HttpStatus.OK)
@@ -64,11 +70,6 @@ describe('Users', () => {
   });
   describe('/POST create user', () => {
     it(`Success create user`, () => {
-      const defaultUser = {
-        username: 'default-user',
-        password: 'default-user-password',
-        email: 'default-user@example.com',
-      };
       return request(app.getHttpServer())
         .post('/users')
         .send(defaultUser)
@@ -82,15 +83,11 @@ describe('Users', () => {
         });
     });
 
-    it(`Failed create duplicate user`, () => {
-      const defaultUser = {
-        username: 'default-user',
-        password: 'default-user-password',
-        email: 'default-user@example.com',
-      };
+    it(`Failed create duplicate user`, async () => {
+      await seedAdminUser(app);
       return request(app.getHttpServer())
         .post('/users')
-        .send(defaultUser)
+        .send(defaultAdmin)
         .expect(HttpStatus.BAD_REQUEST)
         .expect((res) => {
           expect(res.body).toHaveProperty('errors');
@@ -133,21 +130,16 @@ describe('Users', () => {
   });
 
   describe('/GET find user by id', () => {
-    it(`Success find user`, () => {
-      const defaultAdmin = {
-        username: 'default-admin',
-        password: 'default-admin-password',
-        email: 'default-admin@example.com',
-      };
-      const adminId = '1';
+    it(`Success find user`, async () => {
+      ({ adminUser } = await seedAdminUser(app));
       return request(app.getHttpServer())
-        .get(`/users/${adminId}`)
+        .get(`/users/${adminUser.id}`)
         .expect(HttpStatus.OK)
         .expect((res) => {
           expect(res.body).toMatchObject({
-            email: defaultAdmin.email,
-            username: defaultAdmin.username,
-            id: adminId,
+            id: adminUser.id,
+            email: adminUser.email,
+            username: adminUser.username,
           });
         });
     });
@@ -164,21 +156,21 @@ describe('Users', () => {
   });
 
   describe('/PATCH update user by id', () => {
-    it(`Success update user`, () => {
+    it(`Success update user`, async () => {
+      ({ adminUser } = await seedAdminUser(app));
       const updateDefaultAdmin: UpdateUserDto = {
         username: 'update-default-admin',
         email: 'update-default-admin@example.com',
       };
-      const adminId = '1';
       return request(app.getHttpServer())
-        .patch(`/users/${adminId}`)
+        .patch(`/users/${adminUser.id}`)
         .send(updateDefaultAdmin)
         .expect(HttpStatus.OK)
         .expect((res) => {
           expect(res.body).toMatchObject({
             email: updateDefaultAdmin.email,
             username: updateDefaultAdmin.username,
-            id: adminId,
+            id: adminUser.id,
           });
         });
     });
@@ -196,7 +188,7 @@ describe('Users', () => {
   });
 
   describe('/DELETE delete user by id', () => {
-    it(`Success update user`, () => {
+    it(`Success delete user`, () => {
       const adminId = '1';
       return request(app.getHttpServer())
         .delete(`/users/${adminId}`)
