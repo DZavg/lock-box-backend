@@ -6,6 +6,7 @@ import { LoginDto } from '@/auth/dto/login.dto';
 import { errorMessage } from '@/utils/errorMessage';
 import { RegisterDto } from '@/auth/dto/register.dto';
 import { UpdateUserDto } from '@/users/dto/update-user.dto';
+import { successMessage } from '@/utils/successMessage';
 
 @Injectable()
 export class AuthService {
@@ -16,7 +17,7 @@ export class AuthService {
 
   async registration(registerDto: RegisterDto) {
     await this.userService.create(registerDto);
-    return { message: 'Пользователь успешно зарегистрирован' };
+    return { message: successMessage.registration };
   }
 
   async login(loginDto: LoginDto) {
