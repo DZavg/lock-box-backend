@@ -46,7 +46,6 @@ export class AuthService {
   }
 
   async logout(accessToken: string) {
-    console.log(accessToken);
     await this.sessionService.revokeToken(accessToken);
     return { message: 'success' };
   }
