@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { UsersService } from '@/users/users.service';
-import { compareString, hashString } from '@/utils/hash';
+import { compareString } from '@/utils/hash';
 import { SessionService } from '@/session/session.service';
 import { LoginDto } from '@/auth/dto/login.dto';
 import { errorMessage } from '@/utils/errorMessage';
@@ -39,9 +39,6 @@ export class AuthService {
   }
 
   async update(userId: number, updateUserDto: UpdateUserDto) {
-    if (updateUserDto.password) {
-      updateUserDto.password = await hashString(updateUserDto.password);
-    }
     return await this.userService.update(userId, updateUserDto);
   }
 
