@@ -2,10 +2,12 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
+import { Session } from '@/session/entities/session.entity';
 
 @Entity('users')
 export class User {
@@ -21,6 +23,9 @@ export class User {
 
   @Column()
   username: string;
+
+  @OneToMany(() => Session, (session) => session.user)
+  sessions: Session[];
 
   @Exclude()
   @CreateDateColumn({ name: 'created_at', select: false })
