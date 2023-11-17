@@ -27,7 +27,7 @@ export class SessionService {
       accessToken: tokens.access_token,
       refreshToken: tokens.refresh_token,
       expiredAt: accessTokenExpiration,
-      userId: user.id,
+      user: user,
       revoked: false,
     });
 

@@ -2,8 +2,10 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { User } from '@/users/entities/user.entity';
 
 @Entity('session')
 export class Session {
@@ -19,11 +21,11 @@ export class Session {
   @Column({ type: 'boolean' })
   revoked: boolean;
 
+  @ManyToOne(() => User, (user) => user.sessions)
+  user: User;
+
   @Column({ name: 'expired_at' })
   expiredAt: Date;
-
-  @Column({ name: 'user_id', type: 'bigint' })
-  userId: number;
 
   @CreateDateColumn({ name: 'created_id' })
   createdAt: Date;
