@@ -10,10 +10,10 @@ export class Session {
   @PrimaryGeneratedColumn('uuid')
   id: number;
 
-  @Column({ name: 'access_token' })
+  @Column({ name: 'access_token', unique: true })
   accessToken: string;
 
-  @Column({ name: 'refresh_token', nullable: true })
+  @Column({ name: 'refresh_token', unique: true })
   refreshToken: string;
 
   @Column({ type: 'boolean' })

@@ -15,6 +15,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { LoginDto } from '@/auth/dto/login.dto';
 import { UpdateUserDto } from '@/users/dto/update-user.dto';
 import { AuthGuard } from '@/auth/auth.guard';
+import { RefreshDto } from '@/auth/dto/refresh.dto';
 
 @ApiTags('Auth')
 @ApiBearerAuth()
@@ -31,6 +32,12 @@ export class AuthController {
   @Post('/login')
   async login(@Body() loginDto: LoginDto) {
     return this.authService.login(loginDto);
+  }
+
+  @UseGuards(AuthGuard)
+  @Post('/refresh')
+  async refreshToken(@Req() req, @Body() refreshDto: RefreshDto) {
+    return this.authService.refreshToken(req, refreshDto);
   }
 
   @UseGuards(AuthGuard)

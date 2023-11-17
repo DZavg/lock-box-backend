@@ -18,7 +18,22 @@ export class AuthGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     const accessToken = this.extractTokenFromHeader(request);
-    const user = await this.verifyToken(accessToken);
+    const origins = ['/auth/refresh'];
+
+    if (!accessToken) {
+      throw new UnauthorizedException();
+    }
+
+    const verifyAccessToken = await this.sessionService.verifyToken(
+      accessToken,
+      this.configService.get('ACCESS_TOKEN_SECRET_KEY'),
+    );
+
+    if (verifyAccessToken.expired && !origins.includes(request.route.path)) {
+      throw new UnauthorizedException();
+    }
+
+    const user = await this.usersService.findOneById(verifyAccessToken.id);
 
     if ((await this.accessTokenIsRevoked(accessToken)) || !user) {
       throw new UnauthorizedException();
@@ -28,18 +43,6 @@ export class AuthGuard implements CanActivate {
     request.accessToken = accessToken;
 
     return true;
-  }
-
-  private async verifyToken(accessToken) {
-    try {
-      const { id } = await this.jwtService.verifyAsync(accessToken, {
-        secret: this.configService.get('ACCESS_TOKEN_SECRET_KEY'),
-      });
-
-      return await this.usersService.findOneById(id);
-    } catch (e) {
-      throw new UnauthorizedException();
-    }
   }
 
   private async accessTokenIsRevoked(token): Promise<boolean> {

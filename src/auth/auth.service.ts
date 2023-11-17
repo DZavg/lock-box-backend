@@ -7,6 +7,7 @@ import { errorMessage } from '@/utils/errorMessage';
 import { RegisterDto } from '@/auth/dto/register.dto';
 import { UpdateUserDto } from '@/users/dto/update-user.dto';
 import { successMessage } from '@/utils/successMessage';
+import { RefreshDto } from '@/auth/dto/refresh.dto';
 
 @Injectable()
 export class AuthService {
@@ -34,8 +35,11 @@ export class AuthService {
         HttpStatus.BAD_REQUEST,
       );
     }
+    return await this.sessionService.createSession(user);
+  }
 
-    return await this.sessionService.generateTokens(user);
+  async refreshToken(req, refreshDto: RefreshDto) {
+    return await this.sessionService.refreshToken(req, refreshDto);
   }
 
   async update(userId: number, updateUserDto: UpdateUserDto) {

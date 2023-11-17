@@ -25,7 +25,8 @@ const seedAdminUser = async (
   app: INestApplication,
 ): Promise<{
   adminUser: any;
-  authTokenForAdmin: any;
+  accessToken: any;
+  refreshToken: any;
 }> => {
   const usersService = app.get(UsersService);
   const userOutput = await usersService.create(defaultAdmin);
@@ -35,11 +36,38 @@ const seedAdminUser = async (
     .send(loginInput)
     .expect(HttpStatus.CREATED);
 
-  const authTokenForAdmin: any = loginResponse.body.access_token;
+  const accessToken: any = loginResponse.body.access_token;
+  const refreshToken: any = loginResponse.body.refresh_token;
 
   const adminUser: any = JSON.parse(JSON.stringify(userOutput));
 
-  return { adminUser, authTokenForAdmin };
+  return { adminUser, accessToken, refreshToken };
 };
 
-export { seedAdminUser, loginInput, defaultAdmin, defaultUser };
+const seedUser = async (
+  app: INestApplication,
+): Promise<{
+  user: any;
+  accessToken: any;
+  refreshToken: any;
+}> => {
+  const usersService = app.get(UsersService);
+  const userOutput = await usersService.create(defaultUser);
+
+  const loginResponse = await request(app.getHttpServer())
+    .post('/auth/login')
+    .send({
+      email: defaultUser.email,
+      password: defaultUser.password,
+    })
+    .expect(HttpStatus.CREATED);
+
+  const accessToken: any = loginResponse.body.access_token;
+  const refreshToken: any = loginResponse.body.refresh_token;
+
+  const user: any = JSON.parse(JSON.stringify(userOutput));
+
+  return { user, accessToken, refreshToken };
+};
+
+export { seedAdminUser, seedUser, loginInput, defaultAdmin, defaultUser };

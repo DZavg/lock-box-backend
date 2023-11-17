@@ -1,10 +1,9 @@
 import { IsOptional } from 'class-validator';
 
 export class CreateSessionDto {
-  expiredAt: string;
+  expiredAt: Date;
   accessToken: string;
-  @IsOptional()
-  refreshToken?: string;
+  refreshToken: string;
   userId: number;
   @IsOptional()
   revoked?: boolean = false;
