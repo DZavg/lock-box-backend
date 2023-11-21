@@ -4,6 +4,7 @@ import {
   Entity,
   ManyToOne,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { User } from '@/users/entities/user.entity';
 
@@ -27,9 +28,9 @@ export class Session {
   })
   user: User;
 
-  @Column({ name: 'expired_at' })
-  expiredAt: Date;
-
   @CreateDateColumn({ name: 'created_id' })
   createdAt: Date;
+
+  @UpdateDateColumn({ name: 'updated_at' })
+  updatedAt: Date;
 }

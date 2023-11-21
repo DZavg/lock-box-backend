@@ -20,13 +20,11 @@ export class SessionService {
   ) {}
 
   async createSession(user: User) {
-    const accessTokenExpiration = this.getAccessTokenExpiration();
     const tokens = await this.generateTokens(user);
 
     await this.saveTokens({
       accessToken: tokens.access_token,
       refreshToken: tokens.refresh_token,
-      expiredAt: accessTokenExpiration,
       user: user,
       revoked: false,
     });
@@ -77,13 +75,6 @@ export class SessionService {
     await this.revokeToken(accessToken);
 
     return this.createSession(req.user);
-  }
-
-  getAccessTokenExpiration() {
-    return new Date(
-      new Date().getTime() +
-        this.configService.get('ACCESS_TOKEN_EXPIRATION') * 1000,
-    );
   }
 
   async revokeToken(accessToken: string) {
