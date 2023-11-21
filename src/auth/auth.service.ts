@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { UsersService } from '@/users/users.service';
-import { compareString } from '@/utils/hash';
+import { compareStringWithHashByBcrypt } from '@/utils/hash';
 import { SessionService } from '@/session/session.service';
 import { LoginDto } from '@/auth/dto/login.dto';
 import { errorMessage } from '@/utils/errorMessage';
@@ -24,7 +24,7 @@ export class AuthService {
   async login(loginDto: LoginDto) {
     const user = await this.userService.findOneByEmail(loginDto.email);
 
-    const equalsPass = await compareString(
+    const equalsPass = await compareStringWithHashByBcrypt(
       loginDto.password || '',
       user?.password,
     );

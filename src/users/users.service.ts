@@ -4,8 +4,9 @@ import { User } from '@/users/entities/user.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UpdateUserDto } from '@/users/dto/update-user.dto';
-import { hashString } from '@/utils/hash';
+import { hashStringByBcrypt } from '@/utils/hash';
 import { errorMessage } from '@/utils/errorMessage';
+import { SALT_FOR_PASSWORD } from '@/users/constants';
 
 @Injectable()
 export class UsersService {
@@ -14,7 +15,10 @@ export class UsersService {
     private usersRepository: Repository<User>,
   ) {}
   async create(createUserDto: CreateUserDto) {
-    const hashedPassword = await hashString(createUserDto.password);
+    const hashedPassword = await hashStringByBcrypt(
+      createUserDto.password,
+      SALT_FOR_PASSWORD,
+    );
     const newUser = await this.usersRepository.create({
       ...createUserDto,
       password: hashedPassword,
@@ -47,7 +51,10 @@ export class UsersService {
 
   async update(id: number, updateUserDto: UpdateUserDto) {
     if (updateUserDto.password) {
-      updateUserDto.password = await hashString(updateUserDto.password);
+      updateUserDto.password = await hashStringByBcrypt(
+        updateUserDto.password,
+        SALT_FOR_PASSWORD,
+      );
     }
     await this.usersRepository.update({ id }, updateUserDto);
     return await this.findOneById(id);
