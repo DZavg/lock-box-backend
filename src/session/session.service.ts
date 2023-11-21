@@ -9,6 +9,12 @@ import { Session } from '@/session/entities/session.entity';
 import { RefreshDto } from '@/auth/dto/refresh.dto';
 import { UnauthorizedException } from '@/utils/exception/unauthorizedException';
 import { getRandomUuid } from '@/utils/uuid';
+import {
+  compareStringWithHashByBcrypt,
+  hashStringByBcrypt,
+  hashStringBySha256,
+} from '@/utils/hash';
+import { SALT_FOR_TOKEN } from '@/session/constants';
 
 @Injectable()
 export class SessionService {
@@ -21,10 +27,11 @@ export class SessionService {
 
   async createSession(user: User) {
     const tokens = await this.generateTokens(user);
+    const hashedTokens = await this.hashTokens(tokens);
 
     await this.saveTokens({
       accessToken: tokens.access_token,
-      refreshToken: tokens.refresh_token,
+      refreshToken: hashedTokens.refresh_token,
       user: user,
       revoked: false,
     });
@@ -36,6 +43,18 @@ export class SessionService {
     const session = await this.sessionRepository.create(createSessionDto);
     await this.sessionRepository.save(session);
     return session;
+  }
+
+  async hashTokens(tokens) {
+    const hashRefreshToken = await hashStringByBcrypt(
+      hashStringBySha256(tokens.refresh_token),
+      SALT_FOR_TOKEN,
+    );
+
+    return {
+      access_token: tokens.access_token,
+      refresh_token: hashRefreshToken,
+    };
   }
 
   async findByAccessToken(accessToken: string) {
@@ -59,16 +78,17 @@ export class SessionService {
 
   async refreshToken(req, refreshDto: RefreshDto) {
     const accessToken = req.accessToken;
-    const verifyRefreshToken = await this.verifyToken(
+    const refreshTokenIsVerify = await this.verifyToken(
       refreshDto.refresh_token,
       this.configService.get('REFRESH_TOKEN_SECRET_KEY'),
     );
 
     const tokensFromDb = await this.findByAccessToken(accessToken);
-
-    const tokenIsValid = refreshDto.refresh_token === tokensFromDb.refreshToken;
-
-    if (verifyRefreshToken.expired || !tokenIsValid) {
+    const refreshTokenIsValid = await compareStringWithHashByBcrypt(
+      hashStringBySha256(refreshDto.refresh_token),
+      tokensFromDb.refreshToken,
+    );
+    if (refreshTokenIsVerify.expired || !refreshTokenIsValid) {
       throw new UnauthorizedException();
     }
 
