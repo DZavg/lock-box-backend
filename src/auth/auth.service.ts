@@ -7,7 +7,7 @@ import { errorMessage } from '@/utils/errorMessage';
 import { RegisterDto } from '@/auth/dto/register.dto';
 import { UpdateUserDto } from '@/users/dto/update-user.dto';
 import { successMessage } from '@/utils/successMessage';
-import { RefreshDto } from '@/auth/dto/refresh.dto';
+import { RefreshDto } from '@/session/dto/refresh.dto';
 
 @Injectable()
 export class AuthService {

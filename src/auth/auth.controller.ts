@@ -15,7 +15,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { LoginDto } from '@/auth/dto/login.dto';
 import { UpdateUserDto } from '@/users/dto/update-user.dto';
 import { AuthGuard } from '@/auth/auth.guard';
-import { RefreshDto } from '@/auth/dto/refresh.dto';
+import { RefreshDto } from '@/session/dto/refresh.dto';
 
 @ApiTags('Auth')
 @ApiBearerAuth()

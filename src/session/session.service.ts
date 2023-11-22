@@ -6,7 +6,7 @@ import { User } from '@/users/entities/user.entity';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { Session } from '@/session/entities/session.entity';
-import { RefreshDto } from '@/auth/dto/refresh.dto';
+import { RefreshDto } from '@/session/dto/refresh.dto';
 import { UnauthorizedException } from '@/utils/exception/unauthorizedException';
 import { getRandomUuid } from '@/utils/uuid';
 import {
