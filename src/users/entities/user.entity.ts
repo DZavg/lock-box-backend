@@ -7,7 +7,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
-import { Session } from '@/session/entities/session.entity';
+import { Session } from '../../session/entities/session.entity';
 
 @Entity('users')
 export class User {
