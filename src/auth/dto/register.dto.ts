@@ -1,6 +1,6 @@
 import { IsEmail, IsString, Length } from 'class-validator';
 import { errorMessage } from '@/utils/errorMessage';
-import { IsUnique } from '@/utils/isUnique';
+import { IsUnique } from '@/utils/decorators/validation/isUnique';
 import { User } from '@/users/entities/user.entity';
 import { IsNotEmpty } from '@/utils/decorators/validation/isNotEmpty';
 
