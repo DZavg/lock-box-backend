@@ -1,16 +1,17 @@
-import { IsEmail, IsNotEmpty, IsString, Length } from 'class-validator';
+import { IsEmail, IsString, Length } from 'class-validator';
 import { errorMessage } from '@/utils/errorMessage';
 import { IsUnique } from '@/utils/isUnique';
 import { User } from '@/users/entities/user.entity';
+import { IsNotEmpty } from '@/utils/decorators/validation/isNotEmpty';
 
 export class RegisterDto {
-  @IsNotEmpty({ message: errorMessage.IsNotEmpty })
+  @IsNotEmpty()
   @IsString({ message: errorMessage.IsString })
   @IsEmail({}, { message: errorMessage.IsEmail })
   @IsUnique(User, { message: errorMessage.UserWithEmailExist })
   email: string;
 
-  @IsNotEmpty({ message: errorMessage.IsNotEmpty })
+  @IsNotEmpty()
   @IsString({ message: errorMessage.IsString })
   @Length(6, 30, { message: errorMessage.Length(6, 30) })
   password: string;
