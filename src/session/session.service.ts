@@ -26,12 +26,17 @@ export class SessionService {
   ) {}
 
   async createSession(user: User) {
-    const tokens = await this.generateTokens(user);
+    const jwtId = getRandomUuid();
+    const payload = { id: user.id };
+    const options = { jwtid: jwtId };
+
+    const tokens = await this.generateTokens(payload, options);
     const hashedTokens = await this.hashTokens(tokens);
 
     await this.saveTokens({
-      accessToken: tokens.access_token,
+      accessToken: hashedTokens.access_token,
       refreshToken: hashedTokens.refresh_token,
+      jwtId: jwtId,
       user: user,
       revoked: false,
     });
@@ -46,19 +51,27 @@ export class SessionService {
   }
 
   async hashTokens(tokens) {
+    const hashAccessToken = await hashStringByBcrypt(
+      hashStringBySha256(tokens.access_token),
+      SALT_FOR_TOKEN,
+    );
     const hashRefreshToken = await hashStringByBcrypt(
       hashStringBySha256(tokens.refresh_token),
       SALT_FOR_TOKEN,
     );
 
     return {
-      access_token: tokens.access_token,
+      access_token: hashAccessToken,
       refresh_token: hashRefreshToken,
     };
   }
 
   async findByAccessToken(accessToken: string) {
     return await this.sessionRepository.findOneBy({ accessToken });
+  }
+
+  async findByJwtId(jwtId: string) {
+    return await this.sessionRepository.findOneBy({ jwtId });
   }
 
   async deleteByAccessToken(token: string) {
@@ -77,13 +90,13 @@ export class SessionService {
   }
 
   async refreshToken(req, refreshDto: RefreshDto) {
-    const accessToken = req.accessToken;
+    const jwtId = this.getJwtId(req.accessToken);
     const refreshTokenIsVerify = await this.verifyToken(
       refreshDto.refresh_token,
       this.configService.get('REFRESH_TOKEN_SECRET_KEY'),
     );
 
-    const tokensFromDb = await this.findByAccessToken(accessToken);
+    const tokensFromDb = await this.findByJwtId(jwtId);
     const refreshTokenIsValid = await compareStringWithHashByBcrypt(
       hashStringBySha256(refreshDto.refresh_token),
       tokensFromDb.refreshToken,
@@ -92,21 +105,20 @@ export class SessionService {
       throw new UnauthorizedException();
     }
 
-    await this.revokeToken(accessToken);
+    await this.revokeToken(jwtId);
 
     return this.createSession(req.user);
   }
 
-  async revokeToken(accessToken: string) {
-    return await this.sessionRepository.update(
-      { accessToken },
-      { revoked: true },
-    );
+  async revokeToken(jwtId: string) {
+    return await this.sessionRepository.update({ jwtId }, { revoked: true });
   }
 
-  async generateTokens(user: User) {
-    const payload = { id: user.id };
-    const options = { jwtid: getRandomUuid() };
+  getJwtId(accessToken: string) {
+    return JSON.parse(JSON.stringify(this.jwtService.decode(accessToken))).jti;
+  }
+
+  async generateTokens(payload, options) {
     const accessToken = await this.generateAccessToken(payload, options);
     const refreshToken = await this.generateRefreshToken(payload, options);
 

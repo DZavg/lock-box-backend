@@ -5,6 +5,7 @@ export class CreateSessionDto {
   accessToken: string;
   refreshToken: string;
   user: User;
+  jwtId: string;
   @IsOptional()
   revoked?: boolean = false;
 }

@@ -6,7 +6,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { User } from '@/users/entities/user.entity';
+import { User } from '../../users/entities/user.entity';
 
 @Entity('session')
 export class Session {
@@ -27,6 +27,9 @@ export class Session {
     onDelete: 'CASCADE',
   })
   user: User;
+
+  @Column({ type: 'varchar', name: 'jwt_id', unique: true })
+  jwtId: string;
 
   @CreateDateColumn({ name: 'created_id' })
   createdAt: Date;

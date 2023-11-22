@@ -46,7 +46,8 @@ export class AuthGuard implements CanActivate {
   }
 
   private async accessTokenIsRevoked(token): Promise<boolean> {
-    const accessToken = await this.sessionService.findByAccessToken(token);
+    const jwtId = this.sessionService.getJwtId(token);
+    const accessToken = await this.sessionService.findByJwtId(jwtId);
     return !token || !accessToken || accessToken.revoked;
   }
 
