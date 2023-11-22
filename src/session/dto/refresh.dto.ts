@@ -1,9 +1,8 @@
-import { IsString } from 'class-validator';
-import { errorMessage } from '@/utils/errorMessage';
 import { IsNotEmpty } from '@/utils/decorators/validation/isNotEmpty';
+import { IsString } from '@/utils/decorators/validation/isString';
 
 export class RefreshDto {
   @IsNotEmpty()
-  @IsString({ message: errorMessage.IsString })
+  @IsString()
   refresh_token: string;
 }

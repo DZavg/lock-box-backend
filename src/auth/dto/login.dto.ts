@@ -1,14 +1,15 @@
-import { IsEmail, IsString } from 'class-validator';
+import { IsEmail } from 'class-validator';
 import { errorMessage } from '@/utils/errorMessage';
 import { IsNotEmpty } from '@/utils/decorators/validation/isNotEmpty';
+import { IsString } from '@/utils/decorators/validation/isString';
 
 export class LoginDto {
   @IsNotEmpty()
-  @IsString({ message: errorMessage.IsString })
+  @IsString()
   @IsEmail({}, { message: errorMessage.IsEmail })
   email: string;
 
   @IsNotEmpty()
-  @IsString({ message: errorMessage.IsString })
+  @IsString()
   password: string;
 }
