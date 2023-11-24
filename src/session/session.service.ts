@@ -9,12 +9,7 @@ import { Session } from '@/session/entities/session.entity';
 import { RefreshDto } from '@/session/dto/refresh.dto';
 import { UnauthorizedException } from '@/utils/exception/unauthorizedException';
 import { getRandomUuid } from '@/utils/uuid';
-import {
-  compareStringWithHashByBcrypt,
-  hashStringByBcrypt,
-  hashStringBySha256,
-} from '@/utils/hash';
-import { SALT_FOR_TOKEN } from '@/session/constants';
+import { hashStringBySha256 } from '@/utils/hash';
 
 @Injectable()
 export class SessionService {
@@ -51,14 +46,8 @@ export class SessionService {
   }
 
   async hashTokens(tokens) {
-    const hashAccessToken = await hashStringByBcrypt(
-      hashStringBySha256(tokens.access_token),
-      SALT_FOR_TOKEN,
-    );
-    const hashRefreshToken = await hashStringByBcrypt(
-      hashStringBySha256(tokens.refresh_token),
-      SALT_FOR_TOKEN,
-    );
+    const hashAccessToken = hashStringBySha256(tokens.access_token);
+    const hashRefreshToken = hashStringBySha256(tokens.refresh_token);
 
     return {
       access_token: hashAccessToken,
@@ -97,10 +86,10 @@ export class SessionService {
     );
 
     const tokensFromDb = await this.findByJwtId(jwtId);
-    const refreshTokenIsValid = await compareStringWithHashByBcrypt(
-      hashStringBySha256(refreshDto.refresh_token),
-      tokensFromDb.refreshToken,
-    );
+    const refreshTokenIsValid =
+      hashStringBySha256(refreshDto.refresh_token) ===
+      tokensFromDb.refreshToken;
+
     if (refreshTokenIsVerify.expired || !refreshTokenIsValid) {
       throw new UnauthorizedException();
     }
