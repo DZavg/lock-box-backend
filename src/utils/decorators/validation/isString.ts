@@ -9,7 +9,7 @@ import { errorMessage } from '@/utils/errorMessage';
 
 @ValidatorConstraint({ async: false })
 class IsStringConstraint implements ValidatorConstraintInterface {
-  validate(value: any) {
+  validate(value: string) {
     return isString(value);
   }
 }
