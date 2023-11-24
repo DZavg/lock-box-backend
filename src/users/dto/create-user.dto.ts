@@ -1,14 +1,15 @@
-import { IsEmail, Length } from 'class-validator';
+import { Length } from 'class-validator';
 import { errorMessage } from '@/utils/errorMessage';
 import { IsUnique } from '@/utils/decorators/validation/isUnique';
 import { User } from '@/users/entities/user.entity';
 import { IsNotEmpty } from '@/utils/decorators/validation/isNotEmpty';
 import { IsString } from '@/utils/decorators/validation/isString';
+import { IsEmail } from '@/utils/decorators/validation/isEmail';
 
 export class CreateUserDto {
   @IsNotEmpty()
   @IsString()
-  @IsEmail({}, { message: errorMessage.IsEmail })
+  @IsEmail()
   @IsUnique(User, { message: errorMessage.UserWithEmailExist })
   email: string;
 
