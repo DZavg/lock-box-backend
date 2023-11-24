@@ -1,10 +1,10 @@
-import { Length } from 'class-validator';
 import { errorMessage } from '@/utils/errorMessage';
 import { IsUnique } from '@/utils/decorators/validation/isUnique';
 import { User } from '@/users/entities/user.entity';
 import { IsNotEmpty } from '@/utils/decorators/validation/isNotEmpty';
 import { IsString } from '@/utils/decorators/validation/isString';
 import { IsEmail } from '@/utils/decorators/validation/isEmail';
+import { Length } from '@/utils/decorators/validation/length';
 
 export class RegisterDto {
   @IsNotEmpty()
@@ -15,10 +15,10 @@ export class RegisterDto {
 
   @IsNotEmpty()
   @IsString()
-  @Length(6, 30, { message: errorMessage.Length(6, 30) })
+  @Length(6, 30)
   password: string;
 
   @IsString()
-  @Length(2, 15, { message: errorMessage.Length(2, 30) })
+  @Length(2, 15)
   username: string;
 }
