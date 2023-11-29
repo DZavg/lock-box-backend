@@ -5,7 +5,6 @@ import { SessionService } from '@/session/session.service';
 import { LoginDto } from '@/auth/dto/login.dto';
 import { errorMessage } from '@/utils/errorMessage';
 import { RegisterDto } from '@/auth/dto/register.dto';
-import { UpdateUserDto } from '@/users/dto/update-user.dto';
 import { successMessage } from '@/utils/successMessage';
 import { RefreshDto } from '@/session/dto/refresh.dto';
 
@@ -40,10 +39,6 @@ export class AuthService {
 
   async refreshToken(req, refreshDto: RefreshDto) {
     return await this.sessionService.refreshToken(req, refreshDto);
-  }
-
-  async update(userId: number, updateUserDto: UpdateUserDto) {
-    return await this.userService.update(userId, updateUserDto);
   }
 
   async logout(accessToken: string) {

@@ -4,16 +4,13 @@ import {
   Body,
   UseInterceptors,
   ClassSerializerInterceptor,
-  Get,
   Req,
-  Patch,
   UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { LoginDto } from '@/auth/dto/login.dto';
-import { UpdateUserDto } from '@/users/dto/update-user.dto';
 import { AuthGuard } from '@/auth/auth.guard';
 import { RefreshDto } from '@/session/dto/refresh.dto';
 
@@ -38,18 +35,6 @@ export class AuthController {
   @Post('/refresh')
   async refreshToken(@Req() req, @Body() refreshDto: RefreshDto) {
     return this.authService.refreshToken(req, refreshDto);
-  }
-
-  @UseGuards(AuthGuard)
-  @Get('/profile')
-  getProfile(@Req() req) {
-    return req.user;
-  }
-
-  @UseGuards(AuthGuard)
-  @Patch('/profile')
-  async update(@Req() req, @Body() updateUserDto: UpdateUserDto) {
-    return this.authService.update(req.user.id, updateUserDto);
   }
 
   @UseGuards(AuthGuard)

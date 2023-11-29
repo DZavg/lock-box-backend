@@ -8,6 +8,7 @@ import ValidationSchema from '@/utils/validationSchema';
 import { UsersModule } from '@/users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { SessionModule } from './session/session.module';
+import { PersonalModule } from './personal/personal.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { SessionModule } from './session/session.module';
     UsersModule,
     AuthModule,
     SessionModule,
+    PersonalModule,
   ],
   controllers: [AppController],
   providers: [AppService],

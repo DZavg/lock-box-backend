@@ -20,7 +20,6 @@ describe('Auth', () => {
   let userRepository;
   let accessToken;
   let refreshToken;
-  let adminUser;
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -156,72 +155,6 @@ describe('Auth', () => {
     });
   });
 
-  describe('/GET profile', () => {
-    it(`success get profile`, async () => {
-      ({ adminUser, accessToken } = await seedAdminUser(app));
-      return request(app.getHttpServer())
-        .get('/auth/profile')
-        .set('Authorization', 'Bearer ' + accessToken)
-        .expect(HttpStatus.OK)
-        .expect((res) => {
-          expect(res.body).toHaveProperty('id');
-          expect(res.body.email).toEqual(adminUser.email);
-          expect(res.body.username).toEqual(adminUser.username);
-        });
-    });
-
-    it(`failed get profile`, () => {
-      return request(app.getHttpServer())
-        .get('/auth/profile')
-        .set('Authorization', 'Bearer ')
-        .expect(HttpStatus.UNAUTHORIZED)
-        .expect((res) => {
-          expect(res.body).toHaveProperty('error');
-          expect(res.body.error).toEqual(errorMessage.Unauthorized);
-        });
-    });
-  });
-
-  describe('/PATCH profile', () => {
-    const newAdminUserData = {
-      email: 'new-default-admin@example.com',
-      username: 'new-default-admin',
-      password: 'new-default-admin-password',
-    };
-    it(`success update profile`, async () => {
-      ({ adminUser, accessToken } = await seedAdminUser(app));
-      await request(app.getHttpServer())
-        .patch('/auth/profile')
-        .set('Authorization', 'Bearer ' + accessToken)
-        .send(newAdminUserData)
-        .expect(HttpStatus.OK)
-        .expect((res) => {
-          expect(res.body).toHaveProperty('id');
-          expect(res.body).toHaveProperty('email');
-          expect(res.body.username).toEqual(newAdminUserData.username);
-        });
-      return request(app.getHttpServer())
-        .post('/auth/login')
-        .send(newAdminUserData)
-        .expect(HttpStatus.CREATED)
-        .expect((res) => {
-          expect(res.body).toHaveProperty('access_token');
-        });
-    });
-
-    it(`failed update profile`, async () => {
-      return request(app.getHttpServer())
-        .patch('/auth/profile')
-        .set('Authorization', 'Bearer ')
-        .send(newAdminUserData)
-        .expect(HttpStatus.UNAUTHORIZED)
-        .expect((res) => {
-          expect(res.body).toHaveProperty('error');
-          expect(res.body.error).toEqual(errorMessage.Unauthorized);
-        });
-    });
-  });
-
   describe('/Post logout', () => {
     it(`success logout`, async () => {
       ({ adminUser, accessToken } = await seedAdminUser(app));
@@ -234,7 +167,7 @@ describe('Auth', () => {
           expect(res.body.message).toEqual('success');
         });
       return request(app.getHttpServer())
-        .get('/auth/profile')
+        .get('/personal/data')
         .set('Authorization', 'Bearer ' + accessToken)
         .expect(HttpStatus.UNAUTHORIZED)
         .expect((res) => {
@@ -269,7 +202,7 @@ describe('Auth', () => {
           );
         });
       return request(app.getHttpServer())
-        .get('/auth/profile')
+        .get('/personal/data')
         .set('Authorization', 'Bearer ' + newAccessToken)
         .expect(HttpStatus.OK);
     });
