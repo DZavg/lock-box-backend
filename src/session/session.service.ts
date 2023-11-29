@@ -94,12 +94,12 @@ export class SessionService {
       throw new UnauthorizedException();
     }
 
-    await this.revokeToken(jwtId);
+    await this.revokeSession(jwtId);
 
     return this.createSession(req.user);
   }
 
-  async revokeToken(jwtId: string) {
+  async revokeSession(jwtId: string) {
     return await this.sessionRepository.update({ jwtId }, { revoked: true });
   }
 
