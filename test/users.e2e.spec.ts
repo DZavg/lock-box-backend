@@ -1,53 +1,18 @@
 import * as request from 'supertest';
-import { Test } from '@nestjs/testing';
-import {
-  BadRequestException,
-  HttpStatus,
-  INestApplication,
-  ValidationPipe,
-} from '@nestjs/common';
-import { AppModule } from '@/app.module';
+import { HttpStatus, INestApplication } from '@nestjs/common';
 import { defaultAdmin, defaultUser, seedAdminUser } from './seed-jest';
-import { useContainer } from 'class-validator';
 import { errorMessage } from '@/utils/errorMessage';
 import { UpdateUserDto } from '@/users/dto/update-user.dto';
-import { DataSource } from 'typeorm';
-import { User } from '@/users/entities/user.entity';
+import baseConfigTestingModule from './baseConfigTestingModule';
 
 describe('Users', () => {
   let app: INestApplication;
-  let adminUser;
-  let dataSource;
   let userRepository;
+  let config;
 
   beforeAll(async () => {
-    const moduleRef = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile();
-
-    app = moduleRef.createNestApplication();
-
-    app.useGlobalPipes(
-      new ValidationPipe({
-        transform: true,
-        exceptionFactory: (errorsList) => {
-          const errors = {};
-          errorsList.forEach(function (error) {
-            errors[error.property] = Object.values(error.constraints);
-          });
-          return new BadRequestException({
-            errors,
-            statusCode: HttpStatus.BAD_REQUEST,
-          });
-        },
-      }),
-    );
-
-    useContainer(app.select(AppModule), { fallbackOnErrors: true });
-
-    dataSource = moduleRef.get<DataSource>(DataSource);
-
-    userRepository = dataSource.getRepository(User);
+    config = await baseConfigTestingModule();
+    app = config.app;
 
     await app.init();
   });
@@ -131,7 +96,7 @@ describe('Users', () => {
 
   describe('/GET find user by id', () => {
     it(`Success find user`, async () => {
-      ({ adminUser } = await seedAdminUser(app));
+      const { adminUser } = await seedAdminUser(app);
       return request(app.getHttpServer())
         .get(`/users/${adminUser.id}`)
         .expect(HttpStatus.OK)
@@ -157,7 +122,7 @@ describe('Users', () => {
 
   describe('/PATCH update user by id', () => {
     it(`Success update user`, async () => {
-      ({ adminUser } = await seedAdminUser(app));
+      const { adminUser } = await seedAdminUser(app);
       const updateDefaultAdmin: UpdateUserDto = {
         username: 'update-default-admin',
         email: 'update-default-admin@example.com',

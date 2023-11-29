@@ -1,54 +1,19 @@
 import * as request from 'supertest';
-import { Test } from '@nestjs/testing';
-import {
-  BadRequestException,
-  HttpStatus,
-  INestApplication,
-  ValidationPipe,
-} from '@nestjs/common';
-import { AppModule } from '@/app.module';
-import { useContainer } from 'class-validator';
+import { HttpStatus, INestApplication } from '@nestjs/common';
 import { successMessage } from '@/utils/successMessage';
 import { User } from '@/users/entities/user.entity';
-import { DataSource } from 'typeorm';
 import { errorMessage } from '@/utils/errorMessage';
 import { defaultAdmin, loginInput, seedAdminUser, seedUser } from './seed-jest';
+import baseConfigTestingModule from './baseConfigTestingModule';
 
 describe('Auth', () => {
   let app: INestApplication;
-  let dataSource;
   let userRepository;
-  let accessToken;
-  let refreshToken;
+  let config;
 
   beforeAll(async () => {
-    const moduleRef = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile();
-
-    app = moduleRef.createNestApplication();
-
-    app.useGlobalPipes(
-      new ValidationPipe({
-        transform: true,
-        exceptionFactory: (errorsList) => {
-          const errors = {};
-          errorsList.forEach(function (error) {
-            errors[error.property] = Object.values(error.constraints);
-          });
-          return new BadRequestException({
-            errors,
-            statusCode: HttpStatus.BAD_REQUEST,
-          });
-        },
-      }),
-    );
-
-    useContainer(app.select(AppModule), { fallbackOnErrors: true });
-
-    dataSource = moduleRef.get<DataSource>(DataSource);
-
-    userRepository = dataSource.getRepository(User);
+    config = await baseConfigTestingModule();
+    app = config.app;
 
     await app.init();
   });
@@ -58,6 +23,7 @@ describe('Auth', () => {
   });
 
   beforeEach(async () => {
+    userRepository = config.dataSource.getRepository(User);
     await userRepository.remove(await userRepository.find());
   });
 
@@ -157,7 +123,7 @@ describe('Auth', () => {
 
   describe('/Post logout', () => {
     it(`success logout`, async () => {
-      ({ adminUser, accessToken } = await seedAdminUser(app));
+      const { accessToken } = await seedAdminUser(app);
       await request(app.getHttpServer())
         .post('/auth/logout')
         .set('Authorization', 'Bearer ' + accessToken)
@@ -188,7 +154,7 @@ describe('Auth', () => {
   });
   describe('/Post refresh', () => {
     it(`success refresh`, async () => {
-      ({ adminUser, accessToken, refreshToken } = await seedAdminUser(app));
+      const { accessToken, refreshToken } = await seedAdminUser(app);
       let newAccessToken = '';
       await request(app.getHttpServer())
         .post('/auth/refresh')
@@ -208,7 +174,7 @@ describe('Auth', () => {
     });
 
     it(`failed refresh (empty field refreshToken)`, async () => {
-      ({ adminUser, accessToken } = await seedAdminUser(app));
+      const { accessToken } = await seedAdminUser(app);
       return request(app.getHttpServer())
         .post('/auth/refresh')
         .set('Authorization', 'Bearer ' + accessToken)
@@ -224,7 +190,7 @@ describe('Auth', () => {
     });
 
     it(`failed refresh (refresh token not string)`, async () => {
-      ({ adminUser, accessToken } = await seedAdminUser(app));
+      const { accessToken } = await seedAdminUser(app);
       return request(app.getHttpServer())
         .post('/auth/refresh')
         .set('Authorization', 'Bearer ' + accessToken)
@@ -240,7 +206,7 @@ describe('Auth', () => {
     });
 
     it(`failed refresh (refresh token another user)`, async () => {
-      ({ adminUser, accessToken, refreshToken } = await seedAdminUser(app));
+      const { accessToken } = await seedAdminUser(app);
       const user = await seedUser(app);
       return request(app.getHttpServer())
         .post('/auth/refresh')

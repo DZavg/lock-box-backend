@@ -1,53 +1,18 @@
 import * as request from 'supertest';
-import { Test } from '@nestjs/testing';
-import {
-  BadRequestException,
-  HttpStatus,
-  INestApplication,
-  ValidationPipe,
-} from '@nestjs/common';
-import { AppModule } from '@/app.module';
-import { useContainer } from 'class-validator';
+import { HttpStatus, INestApplication } from '@nestjs/common';
 import { User } from '@/users/entities/user.entity';
-import { DataSource } from 'typeorm';
 import { errorMessage } from '@/utils/errorMessage';
 import { seedAdminUser } from './seed-jest';
+import baseConfigTestingModule from './baseConfigTestingModule';
 
 describe('Personal', () => {
   let app: INestApplication;
-  let dataSource;
   let userRepository;
-  let accessToken;
-  let adminUser;
+  let config;
 
   beforeAll(async () => {
-    const moduleRef = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile();
-
-    app = moduleRef.createNestApplication();
-
-    app.useGlobalPipes(
-      new ValidationPipe({
-        transform: true,
-        exceptionFactory: (errorsList) => {
-          const errors = {};
-          errorsList.forEach(function (error) {
-            errors[error.property] = Object.values(error.constraints);
-          });
-          return new BadRequestException({
-            errors,
-            statusCode: HttpStatus.BAD_REQUEST,
-          });
-        },
-      }),
-    );
-
-    useContainer(app.select(AppModule), { fallbackOnErrors: true });
-
-    dataSource = moduleRef.get<DataSource>(DataSource);
-
-    userRepository = dataSource.getRepository(User);
+    config = await baseConfigTestingModule();
+    app = config.app;
 
     await app.init();
   });
@@ -57,12 +22,13 @@ describe('Personal', () => {
   });
 
   beforeEach(async () => {
+    userRepository = config.dataSource.getRepository(User);
     await userRepository.remove(await userRepository.find());
   });
 
   describe('/GET personal data', () => {
     it(`success get personal data`, async () => {
-      ({ adminUser, accessToken } = await seedAdminUser(app));
+      const { adminUser, accessToken } = await seedAdminUser(app);
       return request(app.getHttpServer())
         .get('/personal/data')
         .set('Authorization', 'Bearer ' + accessToken)
@@ -93,7 +59,7 @@ describe('Personal', () => {
       password: 'new-default-admin-password',
     };
     it(`success update personal data`, async () => {
-      ({ adminUser, accessToken } = await seedAdminUser(app));
+      const { accessToken } = await seedAdminUser(app);
       await request(app.getHttpServer())
         .patch('/personal/data')
         .set('Authorization', 'Bearer ' + accessToken)
