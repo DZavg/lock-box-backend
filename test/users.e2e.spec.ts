@@ -4,6 +4,7 @@ import { defaultAdmin, defaultUser, seedAdminUser } from './seed-jest';
 import { errorMessage } from '@/utils/errorMessage';
 import { UpdateUserDto } from '@/users/dto/update-user.dto';
 import baseConfigTestingModule from './baseConfigTestingModule';
+import { User } from '@/users/entities/user.entity';
 
 describe('Users', () => {
   let app: INestApplication;
@@ -22,6 +23,7 @@ describe('Users', () => {
   });
 
   beforeEach(async () => {
+    userRepository = config.dataSource.getRepository(User);
     await userRepository.remove(await userRepository.find());
   });
 
