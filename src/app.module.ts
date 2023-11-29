@@ -9,6 +9,7 @@ import { UsersModule } from '@/users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { SessionModule } from './session/session.module';
 import { PersonalModule } from './personal/personal.module';
+import { TokensModule } from './tokens/tokens.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { PersonalModule } from './personal/personal.module';
     AuthModule,
     SessionModule,
     PersonalModule,
+    TokensModule,
   ],
   controllers: [AppController],
   providers: [AppService],

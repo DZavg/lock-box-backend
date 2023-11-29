@@ -7,12 +7,14 @@ import { errorMessage } from '@/utils/errorMessage';
 import { RegisterDto } from '@/auth/dto/register.dto';
 import { successMessage } from '@/utils/successMessage';
 import { RefreshDto } from '@/session/dto/refresh.dto';
+import { TokensService } from '@/tokens/tokens.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private userService: UsersService,
     private sessionService: SessionService,
+    private tokensService: TokensService,
   ) {}
 
   async registration(registerDto: RegisterDto) {
@@ -42,7 +44,7 @@ export class AuthService {
   }
 
   async logout(accessToken: string) {
-    const jwtId = this.sessionService.getJwtId(accessToken);
+    const jwtId = this.tokensService.getJwtId(accessToken);
     await this.sessionService.revokeSession(jwtId);
     return { message: 'success' };
   }

@@ -1,18 +1,18 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { ConfigService } from '@nestjs/config';
 import { UsersService } from '@/users/users.service';
 import { SessionService } from '@/session/session.service';
 import { UnauthorizedException } from '@/utils/exception/unauthorizedException';
+import { TokensService } from '@/tokens/tokens.service';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
-    private jwtService: JwtService,
     private configService: ConfigService,
     private usersService: UsersService,
     private sessionService: SessionService,
+    private tokensService: TokensService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -24,7 +24,7 @@ export class AuthGuard implements CanActivate {
       throw new UnauthorizedException();
     }
 
-    const verifyAccessToken = await this.sessionService.verifyToken(
+    const verifyAccessToken = await this.tokensService.verifyToken(
       accessToken,
       this.configService.get('ACCESS_TOKEN_SECRET_KEY'),
     );
@@ -46,7 +46,7 @@ export class AuthGuard implements CanActivate {
   }
 
   private async accessTokenIsRevoked(token): Promise<boolean> {
-    const jwtId = this.sessionService.getJwtId(token);
+    const jwtId = this.tokensService.getJwtId(token);
     const accessToken = await this.sessionService.findByJwtId(jwtId);
     return !token || !accessToken || accessToken.revoked;
   }
