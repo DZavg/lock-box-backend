@@ -7,5 +7,6 @@ export const errorMessage = {
   UserWithEmailExist: 'Пользователь с таким email уже существует',
   Unauthorized: 'Доступ запрещен',
   UserNotFound: 'Пользователь не найден',
+  PasswordError: 'Пароль неверный',
   Length: (min, max) => `Поле должно быть от ${min} до ${max} символов`,
 };
