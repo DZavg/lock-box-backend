@@ -1,7 +1,5 @@
 import 'dotenv/config';
 import { DataSource, DataSourceOptions } from 'typeorm';
-import { runSeeders } from 'typeorm-extension';
-import { MainSeeder } from './seeds/main.seeder';
 
 const options: DataSourceOptions = {
   type: 'postgres',
@@ -15,12 +13,4 @@ const options: DataSourceOptions = {
   entities: ['src/**/*.entity{.ts,.js}'],
 };
 
-const SeedDataSource = new DataSource(options);
-
-(async () => {
-  await SeedDataSource.initialize();
-
-  await runSeeders(SeedDataSource, { seeds: [MainSeeder] });
-
-  process.exit();
-})();
+export default new DataSource(options);

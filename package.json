@@ -19,7 +19,7 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "./test/run.sh",
     "commitlint": "commitlint --edit",
-    "seed": "ts-node ./src/database/data-source.ts"
+    "seed": "ts-node ./src/database/seeds/seeder.ts"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",
