@@ -95,6 +95,7 @@ describe('Auth', () => {
         .expect(HttpStatus.CREATED)
         .expect((res) => {
           expect(res.body).toHaveProperty('access_token');
+          expect(res.body).toHaveProperty('refresh_token');
         });
     });
 
