@@ -1,7 +1,6 @@
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import CreateUserDto from '@/users/dto/create-user.dto';
 import { UsersService } from '@/users/users.service';
-import { LoginDto } from '@/auth/dto/login.dto';
 import * as request from 'supertest';
 
 const defaultAdmin: CreateUserDto = {
@@ -16,11 +15,6 @@ const defaultUser: CreateUserDto = {
   email: 'default-user@example.com',
 };
 
-const loginInput: LoginDto = {
-  email: defaultAdmin.email,
-  password: defaultAdmin.password,
-};
-
 const seedAdminUser = async (
   app: INestApplication,
 ): Promise<{
@@ -33,7 +27,7 @@ const seedAdminUser = async (
 
   const loginResponse = await request(app.getHttpServer())
     .post('/auth/login')
-    .send(loginInput)
+    .send({ email: defaultAdmin.email, password: defaultAdmin.password })
     .expect(HttpStatus.CREATED);
 
   const accessToken: any = loginResponse.body.access_token;
@@ -70,4 +64,4 @@ const seedUser = async (
   return { user, accessToken, refreshToken };
 };
 
-export { seedAdminUser, seedUser, loginInput, defaultAdmin, defaultUser };
+export { seedAdminUser, seedUser, defaultAdmin, defaultUser };

@@ -3,7 +3,7 @@ import { HttpStatus, INestApplication } from '@nestjs/common';
 import { successMessage } from '@/utils/successMessage';
 import { User } from '@/users/entities/user.entity';
 import { errorMessage } from '@/utils/errorMessage';
-import { defaultAdmin, loginInput, seedAdminUser, seedUser } from './seed-jest';
+import { defaultAdmin, seedAdminUser, seedUser } from './seed-jest';
 import baseConfigTestingModule from './baseConfigTestingModule';
 
 describe('Auth', () => {
@@ -91,7 +91,7 @@ describe('Auth', () => {
       await seedAdminUser(app);
       return request(app.getHttpServer())
         .post('/auth/login')
-        .send(loginInput)
+        .send({ email: defaultAdmin.email, password: defaultAdmin.password })
         .expect(HttpStatus.CREATED)
         .expect((res) => {
           expect(res.body).toHaveProperty('access_token');
