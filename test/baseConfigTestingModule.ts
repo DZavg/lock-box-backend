@@ -1,13 +1,9 @@
 import { Test } from '@nestjs/testing';
 import { AppModule } from '@/app.module';
-import {
-  BadRequestException,
-  HttpStatus,
-  INestApplication,
-  ValidationPipe,
-} from '@nestjs/common';
+import { INestApplication } from '@nestjs/common';
 import { useContainer } from 'class-validator';
 import { DataSource } from 'typeorm';
+import validationPipe from '@/utils/validationPipe';
 
 export default async function () {
   const moduleRef = await Test.createTestingModule({
@@ -16,22 +12,7 @@ export default async function () {
 
   const app: INestApplication = moduleRef.createNestApplication();
 
-  app.useGlobalPipes(
-    new ValidationPipe({
-      transform: true,
-      whitelist: true,
-      exceptionFactory: (errorsList) => {
-        const errors = {};
-        errorsList.forEach(function (error) {
-          errors[error.property] = Object.values(error.constraints);
-        });
-        return new BadRequestException({
-          errors,
-          statusCode: HttpStatus.BAD_REQUEST,
-        });
-      },
-    }),
-  );
+  app.useGlobalPipes(validationPipe);
 
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
 
