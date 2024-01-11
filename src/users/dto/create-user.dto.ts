@@ -18,6 +18,7 @@ export class CreateUserDto {
   @Length(6, 30)
   password: string;
 
+  @IsNotEmpty()
   @IsString()
   @Length(2, 30)
   username: string;
