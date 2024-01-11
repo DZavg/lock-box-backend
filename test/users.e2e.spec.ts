@@ -90,7 +90,11 @@ describe('Users', () => {
             ].sort(),
           );
           expect(res.body.errors.username.sort()).toEqual(
-            [errorMessage.Length(2, 30), errorMessage.IsString].sort(),
+            [
+              errorMessage.Length(2, 30),
+              errorMessage.IsString,
+              errorMessage.IsNotEmpty,
+            ].sort(),
           );
         });
     });
