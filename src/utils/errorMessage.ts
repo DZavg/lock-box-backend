@@ -8,5 +8,6 @@ export const errorMessage = {
   Unauthorized: 'Доступ запрещен',
   UserNotFound: 'Пользователь не найден',
   PasswordError: 'Пароль неверный',
+  PasswordsMatch: 'Пароли совпадают',
   Length: (min, max) => `Поле должно быть от ${min} до ${max} символов`,
 };
