@@ -12,4 +12,7 @@ export default {
   ACCESS_TOKEN_SECRET_KEY: Joi.string().required(),
   REFRESH_TOKEN_EXPIRATION: Joi.string().required(),
   REFRESH_TOKEN_SECRET_KEY: Joi.string().required(),
+  MAILER_SERVICE: Joi.string().required(),
+  MAILER_USER: Joi.string().required(),
+  MAILER_PASSWORD: Joi.string().required(),
 };

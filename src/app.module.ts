@@ -10,6 +10,7 @@ import { AuthModule } from './auth/auth.module';
 import { SessionsModule } from './sessions/sessions.module';
 import { PersonalModule } from './personal/personal.module';
 import { TokensModule } from './tokens/tokens.module';
+import { MailerModule } from './mailer/mailer.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { TokensModule } from './tokens/tokens.module';
     SessionsModule,
     PersonalModule,
     TokensModule,
+    MailerModule,
   ],
   controllers: [AppController],
   providers: [AppService],
