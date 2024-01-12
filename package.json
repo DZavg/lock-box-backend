@@ -19,7 +19,13 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "./test/run.sh",
     "commitlint": "commitlint --edit",
-    "seed": "ts-node ./src/database/seeds/seeder.ts"
+    "seed": "ts-node ./src/database/seeds/seeder.ts",
+    "typeorm": "typeorm-ts-node-commonjs",
+    "migration:create": "npm run typeorm migration:create -- ./migrations/",
+    "migration:show": "npm run typeorm migration:show -- -d ./src/database/data-source.ts ",
+    "migration:generate": "npm run typeorm migration:generate -- ./migrations/migration -d ./src/database/data-source.ts -p",
+    "migration:run": "npm run typeorm migration:run -- -d ./src/database/data-source.ts",
+    "migration:down": "npm run typeorm migration:revert -- -d ./src/database/data-source.ts"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",
