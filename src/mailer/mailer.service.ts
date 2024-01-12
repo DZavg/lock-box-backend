@@ -20,7 +20,7 @@ export class MailerService {
 
   async sendMail(options: Mail.Options) {
     const mailer = await this.nodemailerTransport.sendMail({
-      from: this.configService.get('EMAIL_USER'),
+      from: this.configService.get('MAILER_USER'),
       ...options,
     });
     if (!mailer.messageId) {
