@@ -9,6 +9,7 @@ const options: DataSourceOptions = {
   password: process.env.POSTGRES_PASSWORD,
   database: process.env.POSTGRES_DB,
   entities: ['src/**/*.entity{.ts,.js}'],
+  synchronize: true,
   migrations: ['migrations/**/*.ts'],
 };
 
