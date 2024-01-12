@@ -9,6 +9,6 @@ export const errorMessage = {
   UserNotFound: 'Пользователь не найден',
   PasswordError: 'Пароль неверный',
   PasswordsMatch: 'Пароли совпадают',
-  MailerError: 'Почтовый сервис не доступен. Повторите попытке позже',
+  MailerError: 'Почтовый сервис временно не доступен. Повторите попытку позже',
   Length: (min, max) => `Поле должно быть от ${min} до ${max} символов`,
 };
