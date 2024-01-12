@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TokensService } from './tokens.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Session } from '@/session/entities/session.entity';
+import { Session } from '@/sessions/entities/session.entity';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 

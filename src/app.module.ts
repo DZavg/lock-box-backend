@@ -7,7 +7,7 @@ import * as Joi from 'joi';
 import ValidationSchema from '@/utils/validationSchema';
 import { UsersModule } from '@/users/users.module';
 import { AuthModule } from './auth/auth.module';
-import { SessionModule } from './session/session.module';
+import { SessionsModule } from './sessions/sessions.module';
 import { PersonalModule } from './personal/personal.module';
 import { TokensModule } from './tokens/tokens.module';
 
@@ -19,7 +19,7 @@ import { TokensModule } from './tokens/tokens.module';
     DatabaseModule,
     UsersModule,
     AuthModule,
-    SessionModule,
+    SessionsModule,
     PersonalModule,
     TokensModule,
   ],

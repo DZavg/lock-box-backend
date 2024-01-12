@@ -1,18 +1,18 @@
 import { Injectable } from '@nestjs/common';
-import { CreateSessionDto } from './dto/create-session.dto';
+import { CreateSessionsDto } from './dto/create-session.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '@/users/entities/user.entity';
 import { ConfigService } from '@nestjs/config';
-import { Session } from '@/session/entities/session.entity';
-import { RefreshDto } from '@/session/dto/refresh.dto';
+import { Session } from '@/sessions/entities/session.entity';
+import { RefreshDto } from '@/sessions/dto/refresh.dto';
 import { UnauthorizedException } from '@/utils/exception/unauthorizedException';
 import { getRandomUuid } from '@/utils/uuid';
 import { hashStringBySha256 } from '@/utils/hash';
 import { TokensService } from '@/tokens/tokens.service';
 
 @Injectable()
-export class SessionService {
+export class SessionsService {
   constructor(
     @InjectRepository(Session)
     private readonly sessionRepository: Repository<Session>,
@@ -39,8 +39,8 @@ export class SessionService {
     return tokens;
   }
 
-  async saveTokens(createSessionDto: CreateSessionDto) {
-    const session = await this.sessionRepository.create(createSessionDto);
+  async saveTokens(createSessionsDto: CreateSessionsDto) {
+    const session = await this.sessionRepository.create(createSessionsDto);
     await this.sessionRepository.save(session);
     return session;
   }

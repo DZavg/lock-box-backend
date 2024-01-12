@@ -1,19 +1,19 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { UsersService } from '@/users/users.service';
 import { compareStringWithHashByBcrypt } from '@/utils/hash';
-import { SessionService } from '@/session/session.service';
+import { SessionsService } from '@/sessions/sessions.service';
 import { LoginDto } from '@/auth/dto/login.dto';
 import { errorMessage } from '@/utils/errorMessage';
 import { RegisterDto } from '@/auth/dto/register.dto';
 import { successMessage } from '@/utils/successMessage';
-import { RefreshDto } from '@/session/dto/refresh.dto';
+import { RefreshDto } from '@/sessions/dto/refresh.dto';
 import { TokensService } from '@/tokens/tokens.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private userService: UsersService,
-    private sessionService: SessionService,
+    private sessionService: SessionsService,
     private tokensService: TokensService,
   ) {}
 

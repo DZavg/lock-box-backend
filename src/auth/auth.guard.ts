@@ -2,7 +2,7 @@ import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Request } from 'express';
 import { ConfigService } from '@nestjs/config';
 import { UsersService } from '@/users/users.service';
-import { SessionService } from '@/session/session.service';
+import { SessionsService } from '@/sessions/sessions.service';
 import { UnauthorizedException } from '@/utils/exception/unauthorizedException';
 import { TokensService } from '@/tokens/tokens.service';
 
@@ -11,7 +11,7 @@ export class AuthGuard implements CanActivate {
   constructor(
     private configService: ConfigService,
     private usersService: UsersService,
-    private sessionService: SessionService,
+    private sessionService: SessionsService,
     private tokensService: TokensService,
   ) {}
 

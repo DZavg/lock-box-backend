@@ -12,7 +12,7 @@ import { RegisterDto } from './dto/register.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { LoginDto } from '@/auth/dto/login.dto';
 import { AuthGuard } from '@/auth/auth.guard';
-import { RefreshDto } from '@/session/dto/refresh.dto';
+import { RefreshDto } from '@/sessions/dto/refresh.dto';
 
 @ApiTags('Auth')
 @ApiBearerAuth()
