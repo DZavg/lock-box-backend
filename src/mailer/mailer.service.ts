@@ -19,16 +19,16 @@ export class MailerService {
   }
 
   async sendMail(options: Mail.Options) {
-    const mailer = await this.nodemailerTransport.sendMail({
-      from: this.configService.get('MAILER_USER'),
-      ...options,
-    });
-    if (!mailer.messageId) {
+    try {
+      return await this.nodemailerTransport.sendMail({
+        from: this.configService.get('MAILER_USER'),
+        ...options,
+      });
+    } catch (e) {
       throw new HttpException(
         { error: errorMessage.MailerError },
         HttpStatus.BAD_REQUEST,
       );
     }
-    return mailer;
   }
 }
