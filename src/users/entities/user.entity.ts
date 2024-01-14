@@ -2,12 +2,15 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { Session } from '../../sessions/entities/session.entity';
+import { ConfirmationCode } from '../../confirmation-codes/entities/confirmation-code.entity';
 
 @Entity('users')
 export class User {
@@ -23,6 +26,17 @@ export class User {
 
   @Column()
   username: string;
+
+  @OneToOne(
+    () => ConfirmationCode,
+    (confirmationCode) => confirmationCode.user,
+    {
+      cascade: true,
+      onDelete: 'CASCADE',
+    },
+  )
+  @JoinColumn()
+  confirmationCode: string;
 
   @OneToMany(() => Session, (session) => session.user)
   sessions: Session[];
