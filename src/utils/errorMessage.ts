@@ -10,5 +10,6 @@ export const errorMessage = {
   PasswordError: 'Пароль неверный',
   PasswordsMatch: 'Пароли совпадают',
   MailerError: 'Почтовый сервис временно не доступен. Повторите попытку позже',
+  IncorrectCode: 'Неверный код',
   Length: (min, max) => `Поле должно быть от ${min} до ${max} символов`,
 };
