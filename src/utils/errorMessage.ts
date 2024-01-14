@@ -11,5 +11,6 @@ export const errorMessage = {
   PasswordsMatch: 'Пароли совпадают',
   MailerError: 'Почтовый сервис временно не доступен. Повторите попытку позже',
   IncorrectCode: 'Неверный код',
+  ExpiredCode: 'Срок действия кода истек',
   Length: (min, max) => `Поле должно быть от ${min} до ${max} символов`,
 };
