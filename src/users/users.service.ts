@@ -51,6 +51,7 @@ export class UsersService {
   async findOneByEmail(email: string) {
     return await this.usersRepository.findOne({
       select: ['id', 'email', 'password'],
+      relations: ['confirmationCode'],
       where: { email },
     });
   }

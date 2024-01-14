@@ -11,6 +11,7 @@ import { SessionsModule } from './sessions/sessions.module';
 import { PersonalModule } from './personal/personal.module';
 import { TokensModule } from './tokens/tokens.module';
 import { MailerModule } from './mailer/mailer.module';
+import { ConfirmationCodesModule } from './confirmation-codes/confirmation-codes.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { MailerModule } from './mailer/mailer.module';
     PersonalModule,
     TokensModule,
     MailerModule,
+    ConfirmationCodesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
