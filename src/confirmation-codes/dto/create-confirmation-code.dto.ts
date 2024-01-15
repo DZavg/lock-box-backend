@@ -1,11 +1,11 @@
 import { IsNotEmpty } from '@/utils/decorators/validation/isNotEmpty';
-import { IsDate, IsNumber } from 'class-validator';
+import { IsDate } from 'class-validator';
 import { IsString } from '@/utils/decorators/validation/isString';
 import { IsEmail } from '@/utils/decorators/validation/isEmail';
 
 export class CreateConfirmationCodeDto {
   @IsNotEmpty()
-  @IsNumber()
+  @IsString()
   code: string;
 
   @IsDate()
