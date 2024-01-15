@@ -2,13 +2,11 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { CreateConfirmationCodeDto } from '../dto/create-confirmation-code.dto';
-import { User } from '../../users/entities/user.entity';
 
 @Entity('confirmationCode')
 export class ConfirmationCode {
@@ -19,8 +17,8 @@ export class ConfirmationCode {
   @Column()
   code: string;
 
-  @OneToOne(() => User, (user) => user.confirmationCode)
-  user: User;
+  @Column({ unique: true })
+  email: string;
 
   @Exclude()
   @CreateDateColumn({ name: 'created_at', select: false })

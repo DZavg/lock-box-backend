@@ -12,7 +12,6 @@ import { RequestCodeDto } from '@/confirmation-codes/dto/request-code.dto';
 import { errorMessage } from '@/utils/errorMessage';
 import { ConfigService } from '@nestjs/config';
 import { VerifyCodeDto } from '@/confirmation-codes/dto/verify-code.dto';
-import { instanceToPlain } from 'class-transformer';
 
 @Injectable()
 export class ConfirmationCodesService {
@@ -24,11 +23,20 @@ export class ConfirmationCodesService {
     private configService: ConfigService,
   ) {}
 
-  async saveCode(createConfirmationCodeDto: CreateConfirmationCodeDto) {
-    const code = this.confirmationCodeRepository.create(
+  async saveOrUpdateCode(createConfirmationCodeDto: CreateConfirmationCodeDto) {
+    return await this.confirmationCodeRepository.upsert(
       createConfirmationCodeDto,
+      { conflictPaths: ['email'] },
     );
-    return this.confirmationCodeRepository.save(code);
+  }
+
+  async findOneByEmailAndCode(verifyCodeDto: VerifyCodeDto) {
+    return await this.confirmationCodeRepository.findOne({
+      where: {
+        code: verifyCodeDto.code,
+        email: verifyCodeDto.email,
+      },
+    });
   }
 
   async requestCode(requestCodeDto: RequestCodeDto) {
@@ -36,12 +44,17 @@ export class ConfirmationCodesService {
     const user = await this.usersService.findOneByEmail(requestCodeDto.email);
 
     if (user) {
-      const expiredCode = new Date(
+      const expiredDate = new Date(
         new Date().getTime() +
           this.configService.get('CONFIRMATION_CODES_EXPIRATION') * 1000,
       );
 
-      await this.saveCode({ code, expiredAt: expiredCode, user });
+      await this.saveOrUpdateCode({
+        code,
+        expiredAt: expiredDate,
+        email: user.email,
+      });
+
       await this.mailerService.sendMail({
         to: requestCodeDto.email,
         subject: 'Код подтверждения на сайте example.ru',
@@ -52,16 +65,15 @@ export class ConfirmationCodesService {
   }
 
   async verifyCode(verifyCodeDto: VerifyCodeDto): Promise<boolean> {
-    const user = await this.usersService.findOneByEmail(verifyCodeDto.email);
-    const code = instanceToPlain(user.confirmationCode);
+    const code = await this.findOneByEmailAndCode(verifyCodeDto);
 
-    if (!user || code.code !== verifyCodeDto.code) {
+    if (!code) {
       throw new HttpException(
         { error: errorMessage.IncorrectCode },
         HttpStatus.BAD_REQUEST,
       );
     }
-    if (code.expiredAt.getTime() < new Date().getTime()) {
+    if (code?.expiredAt?.getTime() < new Date().getTime()) {
       throw new HttpException(
         { error: errorMessage.ExpiredCode },
         HttpStatus.BAD_REQUEST,

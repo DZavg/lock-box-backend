@@ -1,6 +1,7 @@
 import { IsNotEmpty } from '@/utils/decorators/validation/isNotEmpty';
 import { IsDate, IsNumber } from 'class-validator';
-import { User } from '@/users/entities/user.entity';
+import { IsString } from '@/utils/decorators/validation/isString';
+import { IsEmail } from '@/utils/decorators/validation/isEmail';
 
 export class CreateConfirmationCodeDto {
   @IsNotEmpty()
@@ -10,5 +11,8 @@ export class CreateConfirmationCodeDto {
   @IsDate()
   expiredAt: Date;
 
-  user: User;
+  @IsNotEmpty()
+  @IsString()
+  @IsEmail()
+  email: string;
 }
