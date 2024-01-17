@@ -6,9 +6,17 @@ import { SessionsModule } from '@/sessions/sessions.module';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule } from '@nestjs/config';
 import { TokensModule } from '@/tokens/tokens.module';
+import { ConfirmationCodesModule } from '@/confirmation-codes/confirmation-codes.module';
 
 @Module({
-  imports: [UsersModule, SessionsModule, JwtModule, ConfigModule, TokensModule],
+  imports: [
+    UsersModule,
+    SessionsModule,
+    JwtModule,
+    ConfigModule,
+    TokensModule,
+    ConfirmationCodesModule,
+  ],
   controllers: [AuthController],
   providers: [AuthService],
   exports: [AuthService],

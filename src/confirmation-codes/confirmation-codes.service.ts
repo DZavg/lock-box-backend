@@ -30,6 +30,10 @@ export class ConfirmationCodesService {
     );
   }
 
+  async revokeCode(verifyCodeDto: VerifyCodeDto) {
+    return await this.confirmationCodeRepository.delete(verifyCodeDto);
+  }
+
   async findOneByEmailAndCode(verifyCodeDto: VerifyCodeDto) {
     return await this.confirmationCodeRepository.findOne({
       where: {
@@ -79,6 +83,9 @@ export class ConfirmationCodesService {
         HttpStatus.BAD_REQUEST,
       );
     }
+
+    await this.revokeCode(verifyCodeDto);
+
     return true;
   }
 }

@@ -13,6 +13,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { LoginDto } from '@/auth/dto/login.dto';
 import { AuthGuard } from '@/auth/auth.guard';
 import { RefreshDto } from '@/sessions/dto/refresh.dto';
+import { RecoveryPasswordDto } from '@/auth/dto/recovery-password.dto';
 
 @ApiTags('Auth')
 @ApiBearerAuth()
@@ -29,6 +30,11 @@ export class AuthController {
   @Post('/login')
   async login(@Body() loginDto: LoginDto) {
     return this.authService.login(loginDto);
+  }
+
+  @Post('/recovery-password')
+  async recoveryPassword(@Body() recoveryPasswordDto: RecoveryPasswordDto) {
+    return this.authService.recoveryPassword(recoveryPasswordDto);
   }
 
   @UseGuards(AuthGuard)

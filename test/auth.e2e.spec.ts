@@ -5,6 +5,8 @@ import { User } from '@/users/entities/user.entity';
 import { errorMessage } from '@/utils/errorMessage';
 import { defaultAdmin, seedAdminUser, seedUser } from './seed-jest';
 import baseConfigTestingModule from './baseConfigTestingModule';
+import { ConfirmationCode } from '@/confirmation-codes/entities/confirmation-code.entity';
+import { instanceToPlain } from 'class-transformer';
 
 describe('Auth', () => {
   let app: INestApplication;
@@ -217,6 +219,82 @@ describe('Auth', () => {
         .expect((res) => {
           expect(res.body).toHaveProperty('error');
           expect(res.body.error).toEqual(errorMessage.Unauthorized);
+        });
+    });
+  });
+
+  describe('/Post recovery-password', () => {
+    const url = '/auth/recovery-password';
+
+    async function getConfirmationCode(user) {
+      const confirmationCodeRepository =
+        config.dataSource.getRepository(ConfirmationCode);
+      return instanceToPlain(
+        await confirmationCodeRepository.findOneBy({ email: user.email }),
+      ).code;
+    }
+
+    it(`success recovery-password`, async () => {
+      await seedAdminUser(app);
+      await request(app.getHttpServer())
+        .post('/confirmation-codes')
+        .send({ email: defaultAdmin.email })
+        .expect(HttpStatus.CREATED)
+        .expect((res) => {
+          expect(res.body).toHaveProperty('message');
+          expect(res.body.message).toEqual(successMessage.confirmationCode);
+        });
+
+      return request(app.getHttpServer())
+        .post(url)
+        .send({
+          email: defaultAdmin.email,
+          password: '123456',
+          code: await getConfirmationCode(defaultAdmin),
+        })
+        .expect((res) => {
+          expect(res.body).toHaveProperty('access_token');
+          expect(res.body).toHaveProperty('refresh_token');
+        });
+    });
+
+    it(`failed recovery-password`, async () => {
+      await seedAdminUser(app);
+      await request(app.getHttpServer())
+        .post('/confirmation-codes')
+        .send({ email: defaultAdmin.email })
+        .expect(HttpStatus.CREATED)
+        .expect((res) => {
+          expect(res.body).toHaveProperty('message');
+          expect(res.body.message).toEqual(successMessage.confirmationCode);
+        });
+
+      return request(app.getHttpServer())
+        .post(url)
+        .send({})
+        .expect(HttpStatus.BAD_REQUEST)
+        .expect((res) => {
+          expect(res.body).toHaveProperty('errors');
+          expect(res.body.errors).toHaveProperty('email');
+          expect(res.body.errors).toHaveProperty('password');
+          expect(res.body.errors).toHaveProperty('code');
+          expect(res.body.errors.email.sort()).toEqual(
+            [
+              errorMessage.IsEmail,
+              errorMessage.IsString,
+              errorMessage.IsNotEmpty,
+            ].sort(),
+          );
+          expect(res.body.errors.password.sort()).toEqual(
+            [
+              errorMessage.IsString,
+              errorMessage.IsNotEmpty,
+              errorMessage.Length(6, 30),
+            ].sort(),
+          );
+          expect(res.body.errors.code.sort()).toEqual(
+            [errorMessage.IsString, errorMessage.IsNotEmpty].sort(),
+          );
         });
     });
   });

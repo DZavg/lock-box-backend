@@ -2,7 +2,7 @@ import { IsString } from '@/utils/decorators/validation/isString';
 import { Length } from '@/utils/decorators/validation/length';
 import { IsNotEmpty } from '@/utils/decorators/validation/isNotEmpty';
 
-export class UpdatePasswordDto {
+export class ChangePasswordDto {
   @IsNotEmpty()
   @IsString()
   @Length(6, 30)

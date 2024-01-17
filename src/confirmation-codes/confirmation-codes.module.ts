@@ -16,5 +16,6 @@ import { ConfigModule } from '@nestjs/config';
   ],
   controllers: [ConfirmationCodesController],
   providers: [ConfirmationCodesService],
+  exports: [ConfirmationCodesService],
 })
 export class ConfirmationCodesModule {}

@@ -1,6 +1,9 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { UsersService } from '@/users/users.service';
-import { compareStringWithHashByBcrypt } from '@/utils/hash';
+import {
+  compareStringWithHashByBcrypt,
+  hashStringByBcrypt,
+} from '@/utils/hash';
 import { SessionsService } from '@/sessions/sessions.service';
 import { LoginDto } from '@/auth/dto/login.dto';
 import { errorMessage } from '@/utils/errorMessage';
@@ -8,6 +11,9 @@ import { RegisterDto } from '@/auth/dto/register.dto';
 import { successMessage } from '@/utils/successMessage';
 import { RefreshDto } from '@/sessions/dto/refresh.dto';
 import { TokensService } from '@/tokens/tokens.service';
+import { RecoveryPasswordDto } from '@/auth/dto/recovery-password.dto';
+import { ConfirmationCodesService } from '@/confirmation-codes/confirmation-codes.service';
+import { SALT_FOR_PASSWORD } from '@/users/constants';
 
 @Injectable()
 export class AuthService {
@@ -15,6 +21,7 @@ export class AuthService {
     private userService: UsersService,
     private sessionService: SessionsService,
     private tokensService: TokensService,
+    private confirmationCodesService: ConfirmationCodesService,
   ) {}
 
   async registration(registerDto: RegisterDto) {
@@ -37,6 +44,28 @@ export class AuthService {
       );
     }
     return await this.sessionService.createSession(user);
+  }
+
+  async recoveryPassword(recoveryPasswordDto: RecoveryPasswordDto) {
+    await this.confirmationCodesService.verifyCode({
+      email: recoveryPasswordDto.email,
+      code: recoveryPasswordDto.code,
+    });
+
+    const hashedPassword = await hashStringByBcrypt(
+      recoveryPasswordDto.password,
+      SALT_FOR_PASSWORD,
+    );
+
+    await this.userService.updatePassword({
+      email: recoveryPasswordDto.email,
+      password: hashedPassword,
+    });
+
+    return await this.login({
+      email: recoveryPasswordDto.email,
+      password: recoveryPasswordDto.password,
+    });
   }
 
   async refreshToken(req, refreshDto: RefreshDto) {

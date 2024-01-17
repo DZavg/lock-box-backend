@@ -11,8 +11,9 @@ import {
 import { errorMessage } from '@/utils/errorMessage';
 import { SALT_FOR_PASSWORD } from '@/users/constants';
 import { UpdateUserBySelfDto } from '@/personal/dto/update-user-by-self.dto';
-import { UpdatePasswordDto } from '@/personal/dto/update-password.dto';
 import { successMessage } from '@/utils/successMessage';
+import { ChangePasswordDto } from '@/personal/dto/change-password.dto';
+import { UpdatePasswordDto } from '@/auth/dto/update-password.dto';
 
 @Injectable()
 export class UsersService {
@@ -78,13 +79,13 @@ export class UsersService {
     return await this.findOneById(id);
   }
 
-  async updatePassword(id: number, updatePasswordDto: UpdatePasswordDto) {
-    if (updatePasswordDto.newPassword && updatePasswordDto.password) {
+  async changePassword(id: number, changePasswordDto: ChangePasswordDto) {
+    if (changePasswordDto.newPassword && changePasswordDto.password) {
       const user = await this.getPasswordById(id);
 
       const passwordsIsMatch =
-        updatePasswordDto.newPassword.trim() ===
-        updatePasswordDto.password.trim();
+        changePasswordDto.newPassword.trim() ===
+        changePasswordDto.password.trim();
 
       if (passwordsIsMatch) {
         throw new HttpException(
@@ -94,7 +95,7 @@ export class UsersService {
       }
 
       const passwordIsValid = await compareStringWithHashByBcrypt(
-        updatePasswordDto.password,
+        changePasswordDto.password,
         user.password,
       );
 
@@ -105,16 +106,23 @@ export class UsersService {
         );
       }
 
-      updatePasswordDto.password = await hashStringByBcrypt(
-        updatePasswordDto.newPassword,
+      changePasswordDto.password = await hashStringByBcrypt(
+        changePasswordDto.newPassword,
         SALT_FOR_PASSWORD,
       );
     }
     await this.usersRepository.update(
       { id },
-      { password: updatePasswordDto.password },
+      { password: changePasswordDto.password },
     );
     return { message: successMessage.changePassword };
+  }
+
+  async updatePassword(updatePasswordDto: UpdatePasswordDto) {
+    await this.usersRepository.update(
+      { email: updatePasswordDto.email },
+      { password: updatePasswordDto.password },
+    );
   }
 
   async remove(id: number) {

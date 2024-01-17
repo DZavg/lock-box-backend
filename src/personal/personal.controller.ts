@@ -3,8 +3,8 @@ import { PersonalService } from './personal.service';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@/auth/auth.guard';
 import { UpdateUserBySelfDto } from '@/personal/dto/update-user-by-self.dto';
-import { UpdatePasswordDto } from '@/personal/dto/update-password.dto';
 import { UserDto } from '@/users/dto/user.dto';
+import { ChangePasswordDto } from '@/personal/dto/change-password.dto';
 
 @ApiTags('Personal')
 @ApiBearerAuth()
@@ -29,10 +29,10 @@ export class PersonalController {
 
   @UseGuards(AuthGuard)
   @Patch('/data/password')
-  async updatePassword(
+  async changePassword(
     @Req() req,
-    @Body() updatePasswordDto: UpdatePasswordDto,
+    @Body() changePasswordDto: ChangePasswordDto,
   ): Promise<{ message: string }> {
-    return this.personalService.updatePassword(req.user.id, updatePasswordDto);
+    return this.personalService.changePassword(req.user.id, changePasswordDto);
   }
 }
