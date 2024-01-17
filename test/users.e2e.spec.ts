@@ -5,6 +5,7 @@ import { errorMessage } from '@/utils/errorMessage';
 import { UpdateUserDto } from '@/users/dto/update-user.dto';
 import baseConfigTestingModule from './baseConfigTestingModule';
 import { User } from '@/users/entities/user.entity';
+import { errorMessagesForFields } from './errorMessagesForFields';
 
 describe('Users', () => {
   let app: INestApplication;
@@ -42,11 +43,11 @@ describe('Users', () => {
         .send(defaultUser)
         .expect(HttpStatus.CREATED)
         .expect((res) => {
-          expect(res.body).toMatchObject({
+          expect(res.body).toEqual({
             email: defaultUser.email,
             username: defaultUser.username,
+            id: expect.any(String),
           });
-          expect(res.body).toHaveProperty('id');
         });
     });
 
@@ -57,11 +58,12 @@ describe('Users', () => {
         .send(defaultAdmin)
         .expect(HttpStatus.BAD_REQUEST)
         .expect((res) => {
-          expect(res.body).toHaveProperty('errors');
-          expect(res.body.errors).toHaveProperty('email');
-          expect(res.body.errors.email).toEqual([
-            errorMessage.UserWithEmailExist,
-          ]);
+          expect(res.body).toEqual({
+            errors: {
+              email: [errorMessage.UserWithEmailExist],
+            },
+            statusCode: HttpStatus.BAD_REQUEST,
+          });
         });
     });
 
@@ -72,30 +74,9 @@ describe('Users', () => {
         .expect(HttpStatus.BAD_REQUEST)
         .expect((res) => {
           expect(res.body).toHaveProperty('errors');
-          expect(res.body.errors).toHaveProperty('email');
-          expect(res.body.errors).toHaveProperty('password');
-          expect(res.body.errors).toHaveProperty('username');
-          expect(res.body.errors.email.sort()).toEqual(
-            [
-              errorMessage.IsEmail,
-              errorMessage.IsString,
-              errorMessage.IsNotEmpty,
-            ].sort(),
-          );
-          expect(res.body.errors.password.sort()).toEqual(
-            [
-              errorMessage.Length(6, 30),
-              errorMessage.IsString,
-              errorMessage.IsNotEmpty,
-            ].sort(),
-          );
-          expect(res.body.errors.username.sort()).toEqual(
-            [
-              errorMessage.Length(2, 30),
-              errorMessage.IsString,
-              errorMessage.IsNotEmpty,
-            ].sort(),
-          );
+          errorMessagesForFields.email(res);
+          errorMessagesForFields.password(res);
+          errorMessagesForFields.username(res);
         });
     });
   });
@@ -107,7 +88,7 @@ describe('Users', () => {
         .get(`/users/${adminUser.id}`)
         .expect(HttpStatus.OK)
         .expect((res) => {
-          expect(res.body).toMatchObject({
+          expect(res.body).toEqual({
             id: adminUser.id,
             email: adminUser.email,
             username: adminUser.username,
@@ -120,8 +101,9 @@ describe('Users', () => {
         .get(`/users/${userId}`)
         .expect(HttpStatus.BAD_REQUEST)
         .expect((res) => {
-          expect(res.body).toHaveProperty('error');
-          expect(res.body.error).toEqual(errorMessage.UserNotFound);
+          expect(res.body).toEqual({
+            error: errorMessage.UserNotFound,
+          });
         });
     });
   });
@@ -138,7 +120,7 @@ describe('Users', () => {
         .send(updateDefaultAdmin)
         .expect(HttpStatus.OK)
         .expect((res) => {
-          expect(res.body).toMatchObject({
+          expect(res.body).toEqual({
             email: updateDefaultAdmin.email,
             username: updateDefaultAdmin.username,
             id: adminUser.id,
@@ -152,8 +134,9 @@ describe('Users', () => {
         .send({})
         .expect(HttpStatus.BAD_REQUEST)
         .expect((res) => {
-          expect(res.body).toHaveProperty('error');
-          expect(res.body.error).toEqual(errorMessage.UserNotFound);
+          expect(res.body).toEqual({
+            error: errorMessage.UserNotFound,
+          });
         });
     });
   });
@@ -165,7 +148,9 @@ describe('Users', () => {
         .delete(`/users/${adminId}`)
         .expect(HttpStatus.OK)
         .expect((res) => {
-          expect(res.body.message).toEqual('success');
+          expect(res.body).toEqual({
+            message: 'success',
+          });
         });
     });
   });

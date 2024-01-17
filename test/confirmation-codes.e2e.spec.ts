@@ -1,8 +1,8 @@
 import * as request from 'supertest';
 import { HttpStatus, INestApplication } from '@nestjs/common';
-import { errorMessage } from '@/utils/errorMessage';
 import baseConfigTestingModule from './baseConfigTestingModule';
 import { successMessage } from '@/utils/successMessage';
+import { errorMessagesForFields } from './errorMessagesForFields';
 
 describe('Personal', () => {
   let app: INestApplication;
@@ -28,8 +28,9 @@ describe('Personal', () => {
         .send({ email: 'example@example.com' })
         .expect(HttpStatus.CREATED)
         .expect((res) => {
-          expect(res.body).toHaveProperty('message');
-          expect(res.body.message).toEqual(successMessage.confirmationCode);
+          expect(res.body).toEqual({
+            message: successMessage.confirmationCode,
+          });
         });
     });
 
@@ -40,14 +41,7 @@ describe('Personal', () => {
         .expect(HttpStatus.BAD_REQUEST)
         .expect((res) => {
           expect(res.body).toHaveProperty('errors');
-          expect(res.body.errors).toHaveProperty('email');
-          expect(res.body.errors.email.sort()).toEqual(
-            [
-              errorMessage.IsEmail,
-              errorMessage.IsString,
-              errorMessage.IsNotEmpty,
-            ].sort(),
-          );
+          errorMessagesForFields.email(res);
         });
     });
   });

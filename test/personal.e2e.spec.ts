@@ -5,6 +5,7 @@ import { errorMessage } from '@/utils/errorMessage';
 import { defaultAdmin, seedAdminUser } from './seed-jest';
 import baseConfigTestingModule from './baseConfigTestingModule';
 import { successMessage } from '@/utils/successMessage';
+import { errorMessagesForFields } from './errorMessagesForFields';
 
 describe('Personal', () => {
   let app: INestApplication;
@@ -37,9 +38,11 @@ describe('Personal', () => {
         .set('Authorization', 'Bearer ' + accessToken)
         .expect(HttpStatus.OK)
         .expect((res) => {
-          expect(res.body).toHaveProperty('id');
-          expect(res.body.email).toEqual(adminUser.email);
-          expect(res.body.username).toEqual(adminUser.username);
+          expect(res.body).toEqual({
+            username: adminUser.username,
+            email: adminUser.email,
+            id: expect.any(String),
+          });
         });
     });
 
@@ -49,8 +52,9 @@ describe('Personal', () => {
         .set('Authorization', 'Bearer ')
         .expect(HttpStatus.UNAUTHORIZED)
         .expect((res) => {
-          expect(res.body).toHaveProperty('error');
-          expect(res.body.error).toEqual(errorMessage.Unauthorized);
+          expect(res.body).toEqual({
+            error: errorMessage.Unauthorized,
+          });
         });
     });
   });
@@ -70,18 +74,21 @@ describe('Personal', () => {
         .send(newAdminUserData)
         .expect(HttpStatus.OK)
         .expect((res) => {
-          expect(res.body).toHaveProperty('id');
-          expect(res.body).toHaveProperty('email');
-          expect(res.body.username).toEqual(newAdminUserData.username);
-          expect(res.body.email).toEqual(newAdminUserData.email);
+          expect(res.body).toEqual({
+            username: newAdminUserData.username,
+            email: newAdminUserData.email,
+            id: expect.any(String),
+          });
         });
       return request(app.getHttpServer())
         .post('/auth/login')
         .send({ ...newAdminUserData, password: defaultAdmin.password })
         .expect(HttpStatus.CREATED)
         .expect((res) => {
-          expect(res.body).toHaveProperty('access_token');
-          expect(res.body).toHaveProperty('refresh_token');
+          expect(res.body).toEqual({
+            access_token: expect.any(String),
+            refresh_token: expect.any(String),
+          });
         });
     });
 
@@ -92,8 +99,9 @@ describe('Personal', () => {
         .send({})
         .expect(HttpStatus.UNAUTHORIZED)
         .expect((res) => {
-          expect(res.body).toHaveProperty('error');
-          expect(res.body.error).toEqual(errorMessage.Unauthorized);
+          expect(res.body).toEqual({
+            error: errorMessage.Unauthorized,
+          });
         });
     });
   });
@@ -113,16 +121,19 @@ describe('Personal', () => {
         .send(newAdminUserData)
         .expect(HttpStatus.OK)
         .expect((res) => {
-          expect(res.body).toHaveProperty('message');
-          expect(res.body.message).toEqual(successMessage.changePassword);
+          expect(res.body).toEqual({
+            message: successMessage.changePassword,
+          });
         });
       return request(app.getHttpServer())
         .post('/auth/login')
         .send({ ...defaultAdmin, password: newAdminUserData.newPassword })
         .expect(HttpStatus.CREATED)
         .expect((res) => {
-          expect(res.body).toHaveProperty('access_token');
-          expect(res.body).toHaveProperty('refresh_token');
+          expect(res.body).toEqual({
+            access_token: expect.any(String),
+            refresh_token: expect.any(String),
+          });
         });
     });
 
@@ -138,14 +149,7 @@ describe('Personal', () => {
         .expect(HttpStatus.BAD_REQUEST)
         .expect((res) => {
           expect(res.body).toHaveProperty('errors');
-          expect(res.body.errors).toHaveProperty('password');
-          expect(res.body.errors.password.sort()).toEqual(
-            [
-              errorMessage.Length(6, 30),
-              errorMessage.IsString,
-              errorMessage.IsNotEmpty,
-            ].sort(),
-          );
+          errorMessagesForFields.password(res);
         });
     });
 
@@ -161,14 +165,7 @@ describe('Personal', () => {
         .expect(HttpStatus.BAD_REQUEST)
         .expect((res) => {
           expect(res.body).toHaveProperty('errors');
-          expect(res.body.errors).toHaveProperty('newPassword');
-          expect(res.body.errors.newPassword.sort()).toEqual(
-            [
-              errorMessage.Length(6, 30),
-              errorMessage.IsString,
-              errorMessage.IsNotEmpty,
-            ].sort(),
-          );
+          errorMessagesForFields.newPassword(res);
         });
     });
 

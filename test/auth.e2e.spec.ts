@@ -7,6 +7,7 @@ import { defaultAdmin, seedAdminUser, seedUser } from './seed-jest';
 import baseConfigTestingModule from './baseConfigTestingModule';
 import { ConfirmationCode } from '@/confirmation-codes/entities/confirmation-code.entity';
 import { instanceToPlain } from 'class-transformer';
+import { errorMessagesForFields } from './errorMessagesForFields';
 
 describe('Auth', () => {
   let app: INestApplication;
@@ -41,7 +42,9 @@ describe('Auth', () => {
         .send(defaultUser)
         .expect(HttpStatus.CREATED)
         .expect((res) => {
-          expect(res.body.message).toEqual(successMessage.registration);
+          expect(res.body).toEqual({
+            message: successMessage.registration,
+          });
         });
     });
 
@@ -52,11 +55,12 @@ describe('Auth', () => {
         .send(defaultAdmin)
         .expect(HttpStatus.BAD_REQUEST)
         .expect((res) => {
-          expect(res.body).toHaveProperty('errors');
-          expect(res.body.errors).toHaveProperty('email');
-          expect(res.body.errors.email.sort()).toEqual(
-            [errorMessage.UserWithEmailExist].sort(),
-          );
+          expect(res.body).toEqual({
+            errors: {
+              email: [errorMessage.UserWithEmailExist],
+            },
+            statusCode: HttpStatus.BAD_REQUEST,
+          });
         });
     });
 
@@ -67,23 +71,9 @@ describe('Auth', () => {
         .expect(HttpStatus.BAD_REQUEST)
         .expect((res) => {
           expect(res.body).toHaveProperty('errors');
-          expect(res.body.errors).toHaveProperty('email');
-          expect(res.body.errors).toHaveProperty('password');
-          expect(res.body.errors).toHaveProperty('username');
-          expect(res.body.errors.email.sort()).toEqual(
-            [
-              errorMessage.IsEmail,
-              errorMessage.IsString,
-              errorMessage.IsNotEmpty,
-            ].sort(),
-          );
-          expect(res.body.errors.password.sort()).toEqual(
-            [
-              errorMessage.Length(6, 30),
-              errorMessage.IsString,
-              errorMessage.IsNotEmpty,
-            ].sort(),
-          );
+          errorMessagesForFields.email(res);
+          errorMessagesForFields.username(res);
+          errorMessagesForFields.password(res);
         });
     });
   });
@@ -96,8 +86,10 @@ describe('Auth', () => {
         .send({ email: defaultAdmin.email, password: defaultAdmin.password })
         .expect(HttpStatus.CREATED)
         .expect((res) => {
-          expect(res.body).toHaveProperty('access_token');
-          expect(res.body).toHaveProperty('refresh_token');
+          expect(res.body).toEqual({
+            access_token: expect.any(String),
+            refresh_token: expect.any(String),
+          });
         });
     });
 
@@ -108,18 +100,11 @@ describe('Auth', () => {
         .expect(HttpStatus.BAD_REQUEST)
         .expect((res) => {
           expect(res.body).toHaveProperty('errors');
-          expect(res.body.errors).toHaveProperty('email');
           expect(res.body.errors).toHaveProperty('password');
-          expect(res.body.errors.email.sort()).toEqual(
-            [
-              errorMessage.IsEmail,
-              errorMessage.IsString,
-              errorMessage.IsNotEmpty,
-            ].sort(),
-          );
           expect(res.body.errors.password.sort()).toEqual(
             [errorMessage.IsString, errorMessage.IsNotEmpty].sort(),
           );
+          errorMessagesForFields.email(res);
         });
     });
   });
@@ -132,16 +117,18 @@ describe('Auth', () => {
         .set('Authorization', 'Bearer ' + accessToken)
         .expect(HttpStatus.CREATED)
         .expect((res) => {
-          expect(res.body).toHaveProperty('message');
-          expect(res.body.message).toEqual('success');
+          expect(res.body).toEqual({
+            message: 'success',
+          });
         });
       return request(app.getHttpServer())
         .get('/personal/data')
         .set('Authorization', 'Bearer ' + accessToken)
         .expect(HttpStatus.UNAUTHORIZED)
         .expect((res) => {
-          expect(res.body).toHaveProperty('error');
-          expect(res.body.error).toEqual(errorMessage.Unauthorized);
+          expect(res.body).toEqual({
+            error: errorMessage.Unauthorized,
+          });
         });
     });
 
@@ -150,8 +137,9 @@ describe('Auth', () => {
         .post('/auth/logout')
         .expect(HttpStatus.UNAUTHORIZED)
         .expect((res) => {
-          expect(res.body).toHaveProperty('error');
-          expect(res.body.error).toEqual(errorMessage.Unauthorized);
+          expect(res.body).toEqual({
+            error: errorMessage.Unauthorized,
+          });
         });
     });
   });
@@ -166,9 +154,10 @@ describe('Auth', () => {
         .expect(HttpStatus.CREATED)
         .expect((res) => {
           newAccessToken = res.body.access_token;
-          expect(Object.keys(res.body).sort()).toEqual(
-            ['access_token', 'refresh_token'].sort(),
-          );
+          expect(res.body).toEqual({
+            access_token: expect.any(String),
+            refresh_token: expect.any(String),
+          });
         });
       return request(app.getHttpServer())
         .get('/personal/data')
@@ -184,11 +173,12 @@ describe('Auth', () => {
         .send({ refresh_token: '' })
         .expect(HttpStatus.BAD_REQUEST)
         .expect((res) => {
-          expect(res.body).toHaveProperty('errors');
-          expect(res.body.errors).toHaveProperty('refresh_token');
-          expect(res.body.errors.refresh_token.sort()).toEqual(
-            [errorMessage.IsNotEmpty].sort(),
-          );
+          expect(res.body).toEqual({
+            errors: {
+              refresh_token: [errorMessage.IsNotEmpty],
+            },
+            statusCode: HttpStatus.BAD_REQUEST,
+          });
         });
     });
 
@@ -200,11 +190,12 @@ describe('Auth', () => {
         .send({ refresh_token: 1232332 })
         .expect(HttpStatus.BAD_REQUEST)
         .expect((res) => {
-          expect(res.body).toHaveProperty('errors');
-          expect(res.body.errors).toHaveProperty('refresh_token');
-          expect(res.body.errors.refresh_token.sort()).toEqual(
-            [errorMessage.IsString].sort(),
-          );
+          expect(res.body).toEqual({
+            errors: {
+              refresh_token: [errorMessage.IsString],
+            },
+            statusCode: HttpStatus.BAD_REQUEST,
+          });
         });
     });
 
@@ -217,8 +208,9 @@ describe('Auth', () => {
         .send({ refresh_token: user.refreshToken })
         .expect(HttpStatus.UNAUTHORIZED)
         .expect((res) => {
-          expect(res.body).toHaveProperty('error');
-          expect(res.body.error).toEqual(errorMessage.Unauthorized);
+          expect(res.body).toEqual({
+            error: errorMessage.Unauthorized,
+          });
         });
     });
   });
@@ -241,8 +233,9 @@ describe('Auth', () => {
         .send({ email: defaultAdmin.email })
         .expect(HttpStatus.CREATED)
         .expect((res) => {
-          expect(res.body).toHaveProperty('message');
-          expect(res.body.message).toEqual(successMessage.confirmationCode);
+          expect(res.body).toEqual({
+            message: successMessage.confirmationCode,
+          });
         });
 
       return request(app.getHttpServer())
@@ -253,8 +246,10 @@ describe('Auth', () => {
           code: await getConfirmationCode(defaultAdmin),
         })
         .expect((res) => {
-          expect(res.body).toHaveProperty('access_token');
-          expect(res.body).toHaveProperty('refresh_token');
+          expect(res.body).toEqual({
+            access_token: expect.any(String),
+            refresh_token: expect.any(String),
+          });
         });
     });
 
@@ -265,8 +260,9 @@ describe('Auth', () => {
         .send({ email: defaultAdmin.email })
         .expect(HttpStatus.CREATED)
         .expect((res) => {
-          expect(res.body).toHaveProperty('message');
-          expect(res.body.message).toEqual(successMessage.confirmationCode);
+          expect(res.body).toEqual({
+            message: successMessage.confirmationCode,
+          });
         });
 
       return request(app.getHttpServer())
@@ -275,26 +271,9 @@ describe('Auth', () => {
         .expect(HttpStatus.BAD_REQUEST)
         .expect((res) => {
           expect(res.body).toHaveProperty('errors');
-          expect(res.body.errors).toHaveProperty('email');
-          expect(res.body.errors).toHaveProperty('password');
-          expect(res.body.errors).toHaveProperty('code');
-          expect(res.body.errors.email.sort()).toEqual(
-            [
-              errorMessage.IsEmail,
-              errorMessage.IsString,
-              errorMessage.IsNotEmpty,
-            ].sort(),
-          );
-          expect(res.body.errors.password.sort()).toEqual(
-            [
-              errorMessage.IsString,
-              errorMessage.IsNotEmpty,
-              errorMessage.Length(6, 30),
-            ].sort(),
-          );
-          expect(res.body.errors.code.sort()).toEqual(
-            [errorMessage.IsString, errorMessage.IsNotEmpty].sort(),
-          );
+          errorMessagesForFields.email(res);
+          errorMessagesForFields.password(res);
+          errorMessagesForFields.code(res);
         });
     });
   });
