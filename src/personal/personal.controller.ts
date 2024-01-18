@@ -8,17 +8,16 @@ import { ChangePasswordDto } from '@/personal/dto/change-password.dto';
 
 @ApiTags('Personal')
 @ApiBearerAuth()
+@UseGuards(AuthGuard)
 @Controller('personal')
 export class PersonalController {
   constructor(private readonly personalService: PersonalService) {}
 
-  @UseGuards(AuthGuard)
   @Get('/data')
   getProfile(@Req() req): UserDto {
     return req.user;
   }
 
-  @UseGuards(AuthGuard)
   @Patch('/data')
   async updateUser(
     @Req() req,
@@ -27,7 +26,6 @@ export class PersonalController {
     return this.personalService.updateUser(req.user.id, updateUserBySelfDto);
   }
 
-  @UseGuards(AuthGuard)
   @Patch('/data/password')
   async changePassword(
     @Req() req,
