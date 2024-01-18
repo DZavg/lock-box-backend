@@ -1,4 +1,4 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import { CanActivate, ExecutionContext } from '@nestjs/common';
 import { Request } from 'express';
 import { ConfigService } from '@nestjs/config';
 import { UsersService } from '@/users/users.service';
@@ -6,7 +6,6 @@ import { SessionsService } from '@/sessions/sessions.service';
 import { UnauthorizedException } from '@/utils/exception/unauthorizedException';
 import { TokensService } from '@/tokens/tokens.service';
 
-@Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
     private configService: ConfigService,
