@@ -16,7 +16,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { UserDto } from '@/users/dto/user.dto';
 import Role from '@/roles/role.enum';
-import { Roles } from '@/users/roles.decorator';
+import { Roles } from '@/roles/roles.decorator';
 import { RolesGuard } from '@/roles/role.guard';
 import { AuthGuard } from '@/auth/auth.guard';
 
