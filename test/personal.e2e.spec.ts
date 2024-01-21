@@ -6,7 +6,7 @@ import { SeedJest } from './seed-jest';
 import baseConfigTestingModule from './baseConfigTestingModule';
 import { successMessage } from '@/utils/successMessage';
 import { errorMessagesForFields } from './errorMessagesForFields';
-import Role from '@/users/role.enum';
+import Role from '@/roles/role.enum';
 
 describe('Personal', () => {
   let app: INestApplication;

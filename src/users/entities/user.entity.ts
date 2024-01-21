@@ -8,7 +8,7 @@ import {
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { Session } from '../../sessions/entities/session.entity';
-import Role from '../role.enum';
+import Role from '../../roles/role.enum';
 
 @Entity('users')
 export class User {
