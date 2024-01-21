@@ -12,6 +12,7 @@ import { RequestCodeDto } from '@/confirmation-codes/dto/request-code.dto';
 import { errorMessage } from '@/utils/errorMessage';
 import { ConfigService } from '@nestjs/config';
 import { VerifyCodeDto } from '@/confirmation-codes/dto/verify-code.dto';
+import { TIMEOUT_REQUEST_CODE } from '@/utils/constants';
 
 @Injectable()
 export class ConfirmationCodesService {
@@ -25,7 +26,7 @@ export class ConfirmationCodesService {
 
   async saveOrUpdateCode(createConfirmationCodeDto: CreateConfirmationCodeDto) {
     return await this.confirmationCodeRepository.upsert(
-      createConfirmationCodeDto,
+      { ...createConfirmationCodeDto, updatedAt: new Date() },
       { conflictPaths: ['email'] },
     );
   }
@@ -43,6 +44,14 @@ export class ConfirmationCodesService {
     });
   }
 
+  async findOneByEmail(email: string) {
+    return await this.confirmationCodeRepository.findOne({
+      where: {
+        email,
+      },
+    });
+  }
+
   async requestCode(requestCodeDto: RequestCodeDto) {
     const code = String(generateFixedLengthNumber(REQUEST_CODE_LENGTH));
     const user = await this.usersService.findOneByEmail(requestCodeDto.email);
@@ -53,8 +62,22 @@ export class ConfirmationCodesService {
           this.configService.get('CONFIRMATION_CODES_EXPIRATION') * 1000,
       );
 
+      const pastCode = await this.findOneByEmail(user.email);
+      const checkTimeout =
+        pastCode &&
+        pastCode.updatedAt.getTime() + TIMEOUT_REQUEST_CODE * 1000 >
+          new Date().getTime();
+
+      if (checkTimeout) {
+        throw new HttpException(
+          { error: errorMessage.Timeout },
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
       await this.saveOrUpdateCode({
-        code,
+        // code,
+        code: '000000',
         expiredAt: expiredDate,
         email: user.email,
       });

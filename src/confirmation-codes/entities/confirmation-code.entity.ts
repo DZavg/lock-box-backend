@@ -25,7 +25,7 @@ export class ConfirmationCode {
   createdAt: Date;
 
   @Exclude()
-  @UpdateDateColumn({ name: 'updated_at', select: false })
+  @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 
   @Column({ name: 'expired_at' })
