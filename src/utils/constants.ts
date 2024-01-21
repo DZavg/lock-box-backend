@@ -1,3 +1,4 @@
 const SALT_FOR_PASSWORD: number = 9;
+const TIMEOUT_REQUEST_CODE: number = 60;
 
-export { SALT_FOR_PASSWORD };
+export { SALT_FOR_PASSWORD, TIMEOUT_REQUEST_CODE };
