@@ -1,7 +1,7 @@
 import { User } from '../../users/entities/user.entity';
 import { faker } from '@faker-js/faker';
 import { hashStringByBcrypt } from '../../utils/hash';
-import { SALT_FOR_PASSWORD } from '../../roles/constants';
+import { SALT_FOR_PASSWORD } from '../../utils/constants';
 
 export const UserFactory = async () => {
   const hashPass = await hashStringByBcrypt('123456', SALT_FOR_PASSWORD);

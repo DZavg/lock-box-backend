@@ -9,7 +9,7 @@ import {
   hashStringByBcrypt,
 } from '@/utils/hash';
 import { errorMessage } from '@/utils/errorMessage';
-import { SALT_FOR_PASSWORD } from '@/roles/constants';
+import { SALT_FOR_PASSWORD } from '@/utils/constants';
 import { UpdateUserBySelfDto } from '@/personal/dto/update-user-by-self.dto';
 import { successMessage } from '@/utils/successMessage';
 import { ChangePasswordDto } from '@/personal/dto/change-password.dto';

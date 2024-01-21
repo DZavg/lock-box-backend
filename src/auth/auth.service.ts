@@ -13,7 +13,7 @@ import { RefreshDto } from '@/sessions/dto/refresh.dto';
 import { TokensService } from '@/tokens/tokens.service';
 import { RecoveryPasswordDto } from '@/auth/dto/recovery-password.dto';
 import { ConfirmationCodesService } from '@/confirmation-codes/confirmation-codes.service';
-import { SALT_FOR_PASSWORD } from '@/roles/constants';
+import { SALT_FOR_PASSWORD } from '@/utils/constants';
 
 @Injectable()
 export class AuthService {

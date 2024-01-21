@@ -6,7 +6,7 @@ import { User } from '@/users/entities/user.entity';
 import { instanceToPlain } from 'class-transformer';
 import Role from '@/roles/role.enum';
 import { hashStringByBcrypt } from '@/utils/hash';
-import { SALT_FOR_PASSWORD } from '@/roles/constants';
+import { SALT_FOR_PASSWORD } from '@/utils/constants';
 
 export const SeedJest = async (app: INestApplication) => {
   const defaultAdmin: CreateUserDto = {
