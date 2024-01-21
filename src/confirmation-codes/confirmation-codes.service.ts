@@ -59,11 +59,11 @@ export class ConfirmationCodesService {
         email: user.email,
       });
 
-      await this.mailerService.sendMail({
-        to: requestCodeDto.email,
-        subject: 'Код подтверждения на сайте example.ru',
-        text: String(code),
-      });
+      // await this.mailerService.sendMail({
+      //   to: requestCodeDto.email,
+      //   subject: 'Код подтверждения на сайте example.ru',
+      //   text: String(code),
+      // });
     }
     return { message: successMessage.confirmationCode };
   }

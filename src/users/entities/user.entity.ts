@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { Session } from '../../sessions/entities/session.entity';
+import Role from '../role.enum';
 
 @Entity('users')
 export class User {
@@ -23,6 +24,14 @@ export class User {
 
   @Column()
   username: string;
+
+  @Column({
+    type: 'enum',
+    enum: Role,
+    array: true,
+    default: [Role.User],
+  })
+  roles: Role[];
 
   @OneToMany(() => Session, (session) => session.user)
   sessions: Session[];

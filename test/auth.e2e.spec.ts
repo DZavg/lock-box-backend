@@ -3,20 +3,22 @@ import { HttpStatus, INestApplication } from '@nestjs/common';
 import { successMessage } from '@/utils/successMessage';
 import { User } from '@/users/entities/user.entity';
 import { errorMessage } from '@/utils/errorMessage';
-import { defaultAdmin, seedAdminUser, seedUser } from './seed-jest';
 import baseConfigTestingModule from './baseConfigTestingModule';
 import { ConfirmationCode } from '@/confirmation-codes/entities/confirmation-code.entity';
 import { instanceToPlain } from 'class-transformer';
 import { errorMessagesForFields } from './errorMessagesForFields';
+import { SeedJest } from './seed-jest';
 
 describe('Auth', () => {
   let app: INestApplication;
   let userRepository;
   let config;
+  let seedJest;
 
   beforeAll(async () => {
     config = await baseConfigTestingModule();
     app = config.app;
+    seedJest = await SeedJest(app);
 
     await app.init();
   });
@@ -31,6 +33,7 @@ describe('Auth', () => {
   });
 
   describe('/POST registration', () => {
+    const url = '/auth/registration';
     it(`success registration`, () => {
       const defaultUser = {
         username: 'default-user',
@@ -38,7 +41,7 @@ describe('Auth', () => {
         email: 'default-user@example.com',
       };
       return request(app.getHttpServer())
-        .post('/auth/registration')
+        .post(url)
         .send(defaultUser)
         .expect(HttpStatus.CREATED)
         .expect((res) => {
@@ -49,9 +52,10 @@ describe('Auth', () => {
     });
 
     it(`failed registration (user already exist)`, async () => {
-      await seedAdminUser(app);
+      await seedJest.seedAdminUser();
+      const { defaultAdmin } = seedJest;
       return request(app.getHttpServer())
-        .post('/auth/registration')
+        .post(url)
         .send(defaultAdmin)
         .expect(HttpStatus.BAD_REQUEST)
         .expect((res) => {
@@ -66,24 +70,38 @@ describe('Auth', () => {
 
     it(`failed registration (empty data)`, () => {
       return request(app.getHttpServer())
-        .post('/auth/registration')
+        .post(url)
         .send({})
         .expect(HttpStatus.BAD_REQUEST)
         .expect((res) => {
-          expect(res.body).toHaveProperty('errors');
-          errorMessagesForFields.email(res);
-          errorMessagesForFields.username(res);
-          errorMessagesForFields.password(res);
+          expect(Object.keys(res.body).sort()).toEqual(
+            ['errors', 'statusCode'].sort(),
+          );
+          expect(res.body.statusCode).toEqual(HttpStatus.BAD_REQUEST);
+          expect(Object.keys(res.body.errors).sort()).toEqual(
+            ['email', 'username', 'password'].sort(),
+          );
+          expect(res.body.errors.email.sort()).toEqual(
+            errorMessagesForFields.email,
+          );
+          expect(res.body.errors.username.sort()).toEqual(
+            errorMessagesForFields.username,
+          );
+          expect(res.body.errors.password.sort()).toEqual(
+            errorMessagesForFields.password,
+          );
         });
     });
   });
 
   describe('/POST login', () => {
+    const url = '/auth/login';
     it(`success login`, async () => {
-      await seedAdminUser(app);
+      await seedJest.seedUser();
+      const { defaultUser } = seedJest;
       return request(app.getHttpServer())
-        .post('/auth/login')
-        .send({ email: defaultAdmin.email, password: defaultAdmin.password })
+        .post(url)
+        .send({ email: defaultUser.email, password: defaultUser.password })
         .expect(HttpStatus.CREATED)
         .expect((res) => {
           expect(res.body).toEqual({
@@ -95,25 +113,33 @@ describe('Auth', () => {
 
     it(`failed login`, () => {
       return request(app.getHttpServer())
-        .post('/auth/login')
+        .post(url)
         .send({})
         .expect(HttpStatus.BAD_REQUEST)
         .expect((res) => {
-          expect(res.body).toHaveProperty('errors');
-          expect(res.body.errors).toHaveProperty('password');
-          expect(res.body.errors.password.sort()).toEqual(
-            [errorMessage.IsString, errorMessage.IsNotEmpty].sort(),
+          expect(Object.keys(res.body).sort()).toEqual(
+            ['errors', 'statusCode'].sort(),
           );
-          errorMessagesForFields.email(res);
+          expect(res.body.statusCode).toEqual(HttpStatus.BAD_REQUEST);
+          expect(Object.keys(res.body.errors).sort()).toEqual(
+            ['email', 'password'].sort(),
+          );
+          expect(res.body.errors.email.sort()).toEqual(
+            errorMessagesForFields.email,
+          );
+          expect(res.body.errors.password.sort()).toEqual(
+            [errorMessage.IsNotEmpty, errorMessage.IsString].sort(),
+          );
         });
     });
   });
 
   describe('/Post logout', () => {
+    const url = '/auth/logout';
     it(`success logout`, async () => {
-      const { accessToken } = await seedAdminUser(app);
+      const { accessToken } = await seedJest.seedUser();
       await request(app.getHttpServer())
-        .post('/auth/logout')
+        .post(url)
         .set('Authorization', 'Bearer ' + accessToken)
         .expect(HttpStatus.CREATED)
         .expect((res) => {
@@ -134,7 +160,7 @@ describe('Auth', () => {
 
     it(`failed logout`, () => {
       return request(app.getHttpServer())
-        .post('/auth/logout')
+        .post(url)
         .expect(HttpStatus.UNAUTHORIZED)
         .expect((res) => {
           expect(res.body).toEqual({
@@ -143,12 +169,14 @@ describe('Auth', () => {
         });
     });
   });
+
   describe('/Post refresh', () => {
+    const url = '/auth/refresh';
     it(`success refresh`, async () => {
-      const { accessToken, refreshToken } = await seedAdminUser(app);
+      const { accessToken, refreshToken } = await seedJest.seedUser();
       let newAccessToken = '';
       await request(app.getHttpServer())
-        .post('/auth/refresh')
+        .post(url)
         .set('Authorization', 'Bearer ' + accessToken)
         .send({ refresh_token: refreshToken })
         .expect(HttpStatus.CREATED)
@@ -166,46 +194,54 @@ describe('Auth', () => {
     });
 
     it(`failed refresh (empty field refreshToken)`, async () => {
-      const { accessToken } = await seedAdminUser(app);
+      const { accessToken } = await seedJest.seedUser();
       return request(app.getHttpServer())
-        .post('/auth/refresh')
+        .post(url)
         .set('Authorization', 'Bearer ' + accessToken)
         .send({ refresh_token: '' })
         .expect(HttpStatus.BAD_REQUEST)
         .expect((res) => {
-          expect(res.body).toEqual({
-            errors: {
-              refresh_token: [errorMessage.IsNotEmpty],
-            },
-            statusCode: HttpStatus.BAD_REQUEST,
-          });
+          expect(Object.keys(res.body).sort()).toEqual(
+            ['errors', 'statusCode'].sort(),
+          );
+          expect(res.body.statusCode).toEqual(HttpStatus.BAD_REQUEST);
+          expect(Object.keys(res.body.errors).sort()).toEqual(
+            ['refresh_token'].sort(),
+          );
+          expect(res.body.errors.refresh_token.sort()).toEqual(
+            [errorMessage.IsNotEmpty].sort(),
+          );
         });
     });
 
     it(`failed refresh (refresh token not string)`, async () => {
-      const { accessToken } = await seedAdminUser(app);
+      const { accessToken } = await seedJest.seedUser();
       return request(app.getHttpServer())
-        .post('/auth/refresh')
+        .post(url)
         .set('Authorization', 'Bearer ' + accessToken)
         .send({ refresh_token: 1232332 })
         .expect(HttpStatus.BAD_REQUEST)
         .expect((res) => {
-          expect(res.body).toEqual({
-            errors: {
-              refresh_token: [errorMessage.IsString],
-            },
-            statusCode: HttpStatus.BAD_REQUEST,
-          });
+          expect(Object.keys(res.body).sort()).toEqual(
+            ['errors', 'statusCode'].sort(),
+          );
+          expect(res.body.statusCode).toEqual(HttpStatus.BAD_REQUEST);
+          expect(Object.keys(res.body.errors).sort()).toEqual(
+            ['refresh_token'].sort(),
+          );
+          expect(res.body.errors.refresh_token.sort()).toEqual(
+            [errorMessage.IsString].sort(),
+          );
         });
     });
 
     it(`failed refresh (refresh token another user)`, async () => {
-      const { accessToken } = await seedAdminUser(app);
-      const user = await seedUser(app);
+      const { refreshToken } = await seedJest.seedUser();
+      const { accessToken } = await seedJest.seedAdminUser();
       return request(app.getHttpServer())
-        .post('/auth/refresh')
+        .post(url)
         .set('Authorization', 'Bearer ' + accessToken)
-        .send({ refresh_token: user.refreshToken })
+        .send({ refresh_token: refreshToken })
         .expect(HttpStatus.UNAUTHORIZED)
         .expect((res) => {
           expect(res.body).toEqual({
@@ -218,7 +254,7 @@ describe('Auth', () => {
   describe('/Post recovery-password', () => {
     const url = '/auth/recovery-password';
 
-    async function getConfirmationCode(user) {
+    async function getConfirmationCodeFromDb(user) {
       const confirmationCodeRepository =
         config.dataSource.getRepository(ConfirmationCode);
       return instanceToPlain(
@@ -226,24 +262,29 @@ describe('Auth', () => {
       ).code;
     }
 
-    it(`success recovery-password`, async () => {
-      await seedAdminUser(app);
+    async function getConfirmationCode(email) {
       await request(app.getHttpServer())
         .post('/confirmation-codes')
-        .send({ email: defaultAdmin.email })
+        .send({ email })
         .expect(HttpStatus.CREATED)
         .expect((res) => {
           expect(res.body).toEqual({
             message: successMessage.confirmationCode,
           });
         });
+    }
 
+    it(`success recovery-password`, async () => {
+      await seedJest.seedUser();
+      const { defaultUser } = seedJest;
+
+      await getConfirmationCode(defaultUser.email);
       return request(app.getHttpServer())
         .post(url)
         .send({
-          email: defaultAdmin.email,
+          email: defaultUser.email,
           password: '123456',
-          code: await getConfirmationCode(defaultAdmin),
+          code: await getConfirmationCodeFromDb(defaultUser),
         })
         .expect((res) => {
           expect(res.body).toEqual({
@@ -254,26 +295,31 @@ describe('Auth', () => {
     });
 
     it(`failed recovery-password`, async () => {
-      await seedAdminUser(app);
-      await request(app.getHttpServer())
-        .post('/confirmation-codes')
-        .send({ email: defaultAdmin.email })
-        .expect(HttpStatus.CREATED)
-        .expect((res) => {
-          expect(res.body).toEqual({
-            message: successMessage.confirmationCode,
-          });
-        });
+      await seedJest.seedUser();
+      const { defaultUser } = seedJest;
 
+      await getConfirmationCode(defaultUser.email);
       return request(app.getHttpServer())
         .post(url)
         .send({})
         .expect(HttpStatus.BAD_REQUEST)
         .expect((res) => {
-          expect(res.body).toHaveProperty('errors');
-          errorMessagesForFields.email(res);
-          errorMessagesForFields.password(res);
-          errorMessagesForFields.code(res);
+          expect(Object.keys(res.body).sort()).toEqual(
+            ['errors', 'statusCode'].sort(),
+          );
+          expect(res.body.statusCode).toEqual(HttpStatus.BAD_REQUEST);
+          expect(Object.keys(res.body.errors).sort()).toEqual(
+            ['email', 'password', 'code'].sort(),
+          );
+          expect(res.body.errors.email.sort()).toEqual(
+            errorMessagesForFields.email,
+          );
+          expect(res.body.errors.password.sort()).toEqual(
+            errorMessagesForFields.password,
+          );
+          expect(res.body.errors.code.sort()).toEqual(
+            errorMessagesForFields.code,
+          );
         });
     });
   });

@@ -40,8 +40,14 @@ describe('Personal', () => {
         .send({})
         .expect(HttpStatus.BAD_REQUEST)
         .expect((res) => {
-          expect(res.body).toHaveProperty('errors');
-          errorMessagesForFields.email(res);
+          expect(Object.keys(res.body).sort()).toEqual(
+            ['errors', 'statusCode'].sort(),
+          );
+          expect(res.body.statusCode).toEqual(HttpStatus.BAD_REQUEST);
+          expect(Object.keys(res.body.errors).sort()).toEqual(['email'].sort());
+          expect(res.body.errors.email.sort()).toEqual(
+            errorMessagesForFields.email,
+          );
         });
     });
   });

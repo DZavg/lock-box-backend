@@ -12,5 +12,6 @@ export const errorMessage = {
   MailerError: 'Почтовый сервис временно не доступен. Повторите попытку позже',
   IncorrectCode: 'Неверный код',
   ExpiredCode: 'Срок действия кода истек',
+  Forbidden: 'Доступ запрещен',
   Length: (min, max) => `Поле должно быть от ${min} до ${max} символов`,
 };

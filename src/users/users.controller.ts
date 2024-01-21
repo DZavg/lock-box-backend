@@ -1,21 +1,29 @@
 import {
-  Controller,
-  Post,
   Body,
   ClassSerializerInterceptor,
-  UseInterceptors,
+  Controller,
+  Delete,
   Get,
   Param,
   Patch,
-  Delete,
+  Post,
+  UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { UserDto } from '@/users/dto/user.dto';
+import Role from '@/users/role.enum';
+import { Roles } from '@/users/roles.decorator';
+import { RolesGuard } from '@/users/role.guard';
+import { AuthGuard } from '@/auth/auth.guard';
 
 @ApiTags('Users')
+@ApiBearerAuth()
+@UseGuards(AuthGuard, RolesGuard)
+@Roles(Role.Admin)
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
