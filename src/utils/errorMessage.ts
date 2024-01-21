@@ -13,5 +13,6 @@ export const errorMessage = {
   IncorrectCode: 'Неверный код',
   ExpiredCode: 'Срок действия кода истек',
   Forbidden: 'Доступ запрещен',
+  Timeout: 'Превышен лимит запросов',
   Length: (min, max) => `Поле должно быть от ${min} до ${max} символов`,
 };
