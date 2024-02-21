@@ -9,6 +9,7 @@ import {
 import { Exclude } from 'class-transformer';
 import { Session } from '../../sessions/entities/session.entity';
 import Role from '../../roles/role.enum';
+import { Project } from '../../projects/entities/project.entity';
 
 @Entity('users')
 export class User {
@@ -35,6 +36,9 @@ export class User {
 
   @OneToMany(() => Session, (session) => session.user)
   sessions: Session[];
+
+  @OneToMany(() => Project, (project) => project.user)
+  projects: Project[];
 
   @Exclude()
   @CreateDateColumn({ name: 'created_at', select: false })

@@ -12,6 +12,7 @@ import { PersonalModule } from './personal/personal.module';
 import { TokensModule } from './tokens/tokens.module';
 import { MailerModule } from './mailer/mailer.module';
 import { ConfirmationCodesModule } from './confirmation-codes/confirmation-codes.module';
+import { ProjectsModule } from './projects/projects.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { ConfirmationCodesModule } from './confirmation-codes/confirmation-codes
     TokensModule,
     MailerModule,
     ConfirmationCodesModule,
+    ProjectsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
