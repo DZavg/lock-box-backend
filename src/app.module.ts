@@ -13,6 +13,7 @@ import { TokensModule } from './tokens/tokens.module';
 import { MailerModule } from './mailer/mailer.module';
 import { ConfirmationCodesModule } from './confirmation-codes/confirmation-codes.module';
 import { ProjectsModule } from './projects/projects.module';
+import { AccessesModule } from './accesses/accesses.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { ProjectsModule } from './projects/projects.module';
     MailerModule,
     ConfirmationCodesModule,
     ProjectsModule,
+    AccessesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

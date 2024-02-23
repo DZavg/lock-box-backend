@@ -3,34 +3,34 @@ import {
   CreateDateColumn,
   Entity,
   ManyToOne,
-  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
-import { User } from '../../users/entities/user.entity';
-import { Access } from '../../accesses/entities/access.entity';
+import { Project } from '@/projects/entities/project.entity';
 
-@Entity('projects')
-export class Project {
+@Entity('acesses')
+export class Access {
   @PrimaryGeneratedColumn({ type: 'bigint' })
   id: number;
 
   @Column()
-  title: string;
+  origin: string;
 
   @Column()
-  domain: string;
+  login: string;
 
-  @Exclude()
-  @ManyToOne(() => User, (user) => user.projects, {
+  @Column()
+  password: string;
+
+  @Column()
+  type: string;
+
+  @ManyToOne(() => Project, (project) => project.accesses, {
     cascade: true,
     onDelete: 'CASCADE',
   })
-  user: User;
-
-  @OneToMany(() => Access, (access) => access.project)
-  accesses: Access[];
+  project: Project;
 
   @Exclude()
   @CreateDateColumn({ name: 'created_at', select: false })
