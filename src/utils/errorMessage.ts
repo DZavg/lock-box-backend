@@ -7,6 +7,7 @@ export const errorMessage = {
   UserWithEmailExist: 'Пользователь с таким email уже существует',
   Unauthorized: 'Доступ запрещен',
   UserNotFound: 'Пользователь не найден',
+  ProjectNotFound: 'Проект не найден',
   PasswordError: 'Пароль неверный',
   PasswordsMatch: 'Пароли совпадают',
   MailerError: 'Почтовый сервис временно не доступен. Повторите попытку позже',

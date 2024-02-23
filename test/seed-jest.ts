@@ -7,6 +7,8 @@ import { instanceToPlain } from 'class-transformer';
 import Role from '@/roles/role.enum';
 import { hashStringByBcrypt } from '@/utils/hash';
 import { SALT_FOR_PASSWORD } from '@/utils/constants';
+import { ProjectSeeder } from '@/database/seeds/project.seeder';
+import { Project } from '@/projects/entities/project.entity';
 
 export const SeedJest = async (app: INestApplication) => {
   const defaultAdmin: CreateUserDto = {
@@ -43,6 +45,8 @@ export const SeedJest = async (app: INestApplication) => {
       }),
     );
 
+    await new ProjectSeeder().run(dataSource);
+
     const loginResponse = await request(app.getHttpServer())
       .post('/auth/login')
       .send({ email: defaultAdmin.email, password: defaultAdmin.password })
@@ -63,6 +67,8 @@ export const SeedJest = async (app: INestApplication) => {
         password: hashedUserPassword,
       }),
     );
+
+    await new ProjectSeeder().run(dataSource);
 
     const loginResponse = await request(app.getHttpServer())
       .post('/auth/login')

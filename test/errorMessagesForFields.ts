@@ -18,4 +18,6 @@ export const errorMessagesForFields = {
     errorMessage.IsString,
     errorMessage.IsNotEmpty,
   ].sort(),
+  projectTitle: [errorMessage.IsString, errorMessage.IsNotEmpty].sort(),
+  projectDomain: [errorMessage.IsString, errorMessage.IsNotEmpty].sort(),
 };

@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Project } from '@/projects/entities/project.entity';
 import { User } from '@/users/entities/user.entity';
+import { errorMessage } from '@/utils/errorMessage';
 
 @Injectable()
 export class ProjectsService {
@@ -28,7 +29,7 @@ export class ProjectsService {
   }
 
   async findOneById(user: User, id: number) {
-    return await this.projectRepository.findOne({
+    const project = await this.projectRepository.findOne({
       where: {
         id,
         user: {
@@ -36,6 +37,15 @@ export class ProjectsService {
         },
       },
     });
+
+    if (!project) {
+      throw new HttpException(
+        { error: errorMessage.ProjectNotFound },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    return project;
   }
 
   async update(user: User, id: number, updateProjectDto: UpdateProjectDto) {
