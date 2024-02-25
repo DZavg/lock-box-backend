@@ -7,6 +7,7 @@ import { ConfigModule } from '@nestjs/config';
 import { UsersModule } from '@/users/users.module';
 import { SessionsModule } from '@/sessions/sessions.module';
 import { TokensModule } from '@/tokens/tokens.module';
+import { AccessesModule } from '@/accesses/accesses.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { TokensModule } from '@/tokens/tokens.module';
     ConfigModule,
     SessionsModule,
     TokensModule,
+    AccessesModule,
   ],
   controllers: [ProjectsController],
   providers: [ProjectsService],

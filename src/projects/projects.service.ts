@@ -6,12 +6,15 @@ import { Repository } from 'typeorm';
 import { Project } from '@/projects/entities/project.entity';
 import { User } from '@/users/entities/user.entity';
 import { errorMessage } from '@/utils/errorMessage';
+import { CreateAccessDto } from '@/accesses/dto/create-access.dto';
+import { AccessesService } from '@/accesses/accesses.service';
 
 @Injectable()
 export class ProjectsService {
   constructor(
     @InjectRepository(Project)
     private projectRepository: Repository<Project>,
+    private accessesService: AccessesService,
   ) {}
   async create(user: User, createProjectDto: CreateProjectDto) {
     const newProject = await this.projectRepository.create({
@@ -22,10 +25,22 @@ export class ProjectsService {
     return newProject;
   }
 
+  async createAccess(user: User, id: number, createAccessDto: CreateAccessDto) {
+    const project = await this.findOneById(user, id);
+
+    return await this.accessesService.create(createAccessDto, project);
+  }
+
   async findAll(user: User) {
     return await this.projectRepository.find({
       where: { user: { id: user.id } },
     });
+  }
+
+  async findAllAccesses(user: User, id: number) {
+    const project = await this.findOneById(user, id);
+
+    return await this.accessesService.findAll(project);
   }
 
   async findOneById(user: User, id: number) {
@@ -49,19 +64,14 @@ export class ProjectsService {
   }
 
   async update(user: User, id: number, updateProjectDto: UpdateProjectDto) {
+    await this.findOneById(user, id);
     await this.projectRepository.update({ id }, updateProjectDto);
     return await this.findOneById(user, id);
   }
 
   async remove(user: User, id: number) {
-    const project = await this.findOneById(user, id);
-    if (project) {
-      await this.projectRepository.delete(id);
-      return { message: 'success' };
-    }
-    throw new HttpException(
-      { error: 'Проекта с таким id не существует' },
-      HttpStatus.BAD_REQUEST,
-    );
+    await this.findOneById(user, id);
+    await this.projectRepository.delete(id);
+    return { message: 'success' };
   }
 }

@@ -8,6 +8,8 @@ export const errorMessage = {
   Unauthorized: 'Доступ запрещен',
   UserNotFound: 'Пользователь не найден',
   ProjectNotFound: 'Проект не найден',
+  AccessNotFound: 'Доступ не найден',
+  PasswordNotFound: 'Пароль не найден',
   PasswordError: 'Пароль неверный',
   PasswordsMatch: 'Пароли совпадают',
   MailerError: 'Почтовый сервис временно не доступен. Повторите попытку позже',

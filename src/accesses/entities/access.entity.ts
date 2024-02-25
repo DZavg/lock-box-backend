@@ -20,12 +20,14 @@ export class Access {
   @Column()
   login: string;
 
+  @Exclude()
   @Column()
   password: string;
 
   @Column()
   type: string;
 
+  @Exclude()
   @ManyToOne(() => Project, (project) => project.accesses, {
     cascade: true,
     onDelete: 'CASCADE',
