@@ -7,7 +7,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
-import { Project } from '@/projects/entities/project.entity';
+import { Project } from '../../projects/entities/project.entity';
 
 @Entity('acesses')
 export class Access {

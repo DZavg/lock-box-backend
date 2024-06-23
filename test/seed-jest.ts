@@ -8,7 +8,6 @@ import Role from '@/roles/role.enum';
 import { hashStringByBcrypt } from '@/utils/hash';
 import { SALT_FOR_PASSWORD } from '@/utils/constants';
 import { ProjectSeeder } from '@/database/seeds/project.seeder';
-import { Project } from '@/projects/entities/project.entity';
 
 export const SeedJest = async (app: INestApplication) => {
   const defaultAdmin: CreateUserDto = {
