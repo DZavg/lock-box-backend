@@ -8,6 +8,7 @@ import { User } from '@/users/entities/user.entity';
 import { errorMessage } from '@/utils/errorMessage';
 import { CreateAccessDto } from '@/accesses/dto/create-access.dto';
 import { AccessesService } from '@/accesses/accesses.service';
+import { successMessage } from '@/utils/successMessage';
 
 @Injectable()
 export class ProjectsService {
@@ -17,12 +18,12 @@ export class ProjectsService {
     private accessesService: AccessesService,
   ) {}
   async create(user: User, createProjectDto: CreateProjectDto) {
-    const newProject = await this.projectRepository.create({
+    const newProject = this.projectRepository.create({
       ...createProjectDto,
       user,
     });
     await this.projectRepository.save(newProject);
-    return newProject;
+    return { message: successMessage.createProject };
   }
 
   async createAccess(user: User, id: number, createAccessDto: CreateAccessDto) {
@@ -39,8 +40,11 @@ export class ProjectsService {
 
   async findAllAccesses(user: User, id: number) {
     const project = await this.findOneById(user, id);
-
-    return await this.accessesService.findAll(project);
+    const accesses = await this.accessesService.findAll(project);
+    return {
+      project,
+      accesses,
+    };
   }
 
   async findOneById(user: User, id: number) {
@@ -72,6 +76,6 @@ export class ProjectsService {
   async remove(user: User, id: number) {
     await this.findOneById(user, id);
     await this.projectRepository.delete(id);
-    return { message: 'success' };
+    return { message: successMessage.deleteProject };
   }
 }
