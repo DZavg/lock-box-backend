@@ -1,20 +1,19 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateAccessDto } from './dto/create-access.dto';
-import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { Access } from '@/accesses/entities/access.entity';
 import { errorMessage } from '@/utils/errorMessage';
 import { ProjectDto } from '@/projects/dto/project.dto';
 import { User } from '@/users/entities/user.entity';
 import { UpdateAccessDto } from '@/accesses/dto/update-access.dto';
+import { successMessage } from '@/utils/successMessage';
 
 @Injectable()
 export class AccessesService {
   constructor(
     @InjectRepository(Access)
     private accessRepository: Repository<Access>,
-    @InjectDataSource()
-    private dataSource: DataSource,
   ) {}
 
   async create(createAccessDto: CreateAccessDto, project: ProjectDto) {
@@ -77,12 +76,12 @@ export class AccessesService {
   async update(id: number, updateAccessDto: UpdateAccessDto, user: User) {
     await this.findOneById(id, user);
     await this.accessRepository.update({ id }, updateAccessDto);
-    return { message: 'success' };
+    return { message: successMessage.updateAccess };
   }
 
   async remove(id: number, user: User) {
     await this.findOneById(id, user);
     await this.accessRepository.delete(id);
-    return { message: 'success' };
+    return { message: successMessage.deleteAccess };
   }
 }

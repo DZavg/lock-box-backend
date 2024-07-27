@@ -7,4 +7,6 @@ export const successMessage = {
   deleteProject: 'Проект успешно удален',
   updateProject: 'Проект успешно обновлен',
   createAccess: 'Доступ успешно создан',
+  updateAccess: 'Доступ успешно обновлен',
+  deleteAccess: 'Доступ успешно удален',
 };
