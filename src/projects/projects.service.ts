@@ -29,7 +29,8 @@ export class ProjectsService {
   async createAccess(user: User, id: number, createAccessDto: CreateAccessDto) {
     const project = await this.findOneById(user, id);
 
-    return await this.accessesService.create(createAccessDto, project);
+    await this.accessesService.create(createAccessDto, project);
+    return { message: successMessage.createAccess };
   }
 
   async findAll(user: User) {
@@ -70,7 +71,7 @@ export class ProjectsService {
   async update(user: User, id: number, updateProjectDto: UpdateProjectDto) {
     await this.findOneById(user, id);
     await this.projectRepository.update({ id }, updateProjectDto);
-    return await this.findOneById(user, id);
+    return { message: successMessage.updateProject };
   }
 
   async remove(user: User, id: number) {

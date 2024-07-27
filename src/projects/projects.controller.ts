@@ -65,7 +65,7 @@ export class ProjectsController {
     @Req() req,
     @Param('id') id: string,
     @Body() updateProjectDto: UpdateProjectDto,
-  ): Promise<ProjectDto> {
+  ) {
     return this.projectsService.update(req.user, +id, updateProjectDto);
   }
 
