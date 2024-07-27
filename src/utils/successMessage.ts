@@ -5,4 +5,6 @@ export const successMessage = {
     'Код подтверждения отправлен на указанную электронную почту',
   createProject: 'Проект успешно создан',
   deleteProject: 'Проект успешно удален',
+  updateProject: 'Проект успешно обновлен',
+  createAccess: 'Доступ успешно создан',
 };
