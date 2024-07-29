@@ -34,11 +34,16 @@ export class ProjectsService {
   }
 
   async findAll(user: User, query: string = '') {
-    return await this.projectRepository.findBy({
-      user: { id: user.id },
-      domain: ILike(`%${query}%`),
-      title: ILike(`%${query}%`),
-    });
+    return await this.projectRepository.findBy([
+      {
+        user: { id: user.id },
+        domain: ILike(`%${query}%`),
+      },
+      {
+        user: { id: user.id },
+        title: ILike(`%${query}%`),
+      },
+    ]);
   }
 
   async findAllAccesses(user: User, id: number) {
