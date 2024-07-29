@@ -28,6 +28,7 @@ export class UsersService {
     );
     const newUser = await this.usersRepository.create({
       ...createUserDto,
+      email: createUserDto.email.toLowerCase(),
       password: hashedPassword,
     });
     await this.usersRepository.save(newUser);
@@ -50,6 +51,7 @@ export class UsersService {
   }
 
   async findOneByEmail(email: string) {
+    email.toLowerCase();
     return await this.usersRepository.findOne({
       select: ['id', 'email', 'password'],
       where: { email },

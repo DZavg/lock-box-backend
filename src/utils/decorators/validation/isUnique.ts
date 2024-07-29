@@ -17,7 +17,7 @@ export class IsUniqueConstraint implements ValidatorConstraintInterface {
       .getRepository(entity)
       .createQueryBuilder('entity')
       .select()
-      .where(`entity.${args.property} = :val`, { val: field })
+      .where(`entity.${args.property} = :val`, { val: field.toLowerCase() })
       .getOne());
   }
 }
