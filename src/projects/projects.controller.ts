@@ -10,6 +10,7 @@ import {
   UseInterceptors,
   ClassSerializerInterceptor,
   Req,
+  Query,
 } from '@nestjs/common';
 import { ProjectsService } from './projects.service';
 import { CreateProjectDto } from './dto/create-project.dto';
@@ -43,8 +44,8 @@ export class ProjectsController {
   }
 
   @Get()
-  findAll(@Req() req): Promise<ProjectDto[]> {
-    return this.projectsService.findAll(req.user);
+  findAll(@Req() req, @Query('query') query: string): Promise<ProjectDto[]> {
+    return this.projectsService.findAll(req.user, query);
   }
 
   @Get(':id/accesses')

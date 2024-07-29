@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 import { Project } from '@/projects/entities/project.entity';
 import { User } from '@/users/entities/user.entity';
 import { errorMessage } from '@/utils/errorMessage';
@@ -33,9 +33,11 @@ export class ProjectsService {
     return { message: successMessage.createAccess };
   }
 
-  async findAll(user: User) {
-    return await this.projectRepository.find({
-      where: { user: { id: user.id } },
+  async findAll(user: User, query: string = '') {
+    return await this.projectRepository.findBy({
+      user: { id: user.id },
+      domain: ILike(`%${query}%`),
+      title: ILike(`%${query}%`),
     });
   }
 
