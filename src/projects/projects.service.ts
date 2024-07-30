@@ -34,16 +34,21 @@ export class ProjectsService {
   }
 
   async findAll(user: User, query: string = '') {
-    return await this.projectRepository.findBy([
-      {
-        user: { id: user.id },
-        domain: ILike(`%${query}%`),
+    return await this.projectRepository.find({
+      where: [
+        {
+          user: { id: user.id },
+          domain: ILike(`%${query}%`),
+        },
+        {
+          user: { id: user.id },
+          title: ILike(`%${query}%`),
+        },
+      ],
+      order: {
+        title: 'ASC',
       },
-      {
-        user: { id: user.id },
-        title: ILike(`%${query}%`),
-      },
-    ]);
+    });
   }
 
   async findAllAccesses(user: User, id: number) {
@@ -56,6 +61,13 @@ export class ProjectsService {
   }
 
   async findOneById(user: User, id: number) {
+    if (!Number.isInteger(id)) {
+      throw new HttpException(
+        { error: errorMessage.ProjectNotFound },
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
     const project = await this.projectRepository.findOne({
       where: {
         id,
@@ -68,7 +80,7 @@ export class ProjectsService {
     if (!project) {
       throw new HttpException(
         { error: errorMessage.ProjectNotFound },
-        HttpStatus.BAD_REQUEST,
+        HttpStatus.NOT_FOUND,
       );
     }
 
