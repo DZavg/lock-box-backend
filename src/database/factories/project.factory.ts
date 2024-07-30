@@ -6,7 +6,7 @@ export const ProjectFactory = async () => {
   const get = async (user: User) => {
     const project = new Project();
     project.title = faker.internet.domainWord();
-    project.domain = faker.internet.domainName();
+    project.domain = faker.internet.url();
     project.user = user;
 
     return project;
