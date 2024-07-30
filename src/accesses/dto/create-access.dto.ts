@@ -1,5 +1,6 @@
 import { IsNotEmpty } from '@/utils/decorators/validation/isNotEmpty';
 import { IsString } from '@/utils/decorators/validation/isString';
+import { AccessTypeDto } from '@/accesses/dto/access-type.dto';
 
 export class CreateAccessDto {
   @IsNotEmpty()
@@ -15,6 +16,5 @@ export class CreateAccessDto {
   password: string;
 
   @IsNotEmpty()
-  @IsString()
-  type: string;
+  type: AccessTypeDto;
 }

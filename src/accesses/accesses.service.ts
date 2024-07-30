@@ -8,12 +8,16 @@ import { ProjectDto } from '@/projects/dto/project.dto';
 import { User } from '@/users/entities/user.entity';
 import { UpdateAccessDto } from '@/accesses/dto/update-access.dto';
 import { successMessage } from '@/utils/successMessage';
+import { AccessType } from '@/accesses/entities/access-type.entity';
+import { AccessTypeDto } from '@/accesses/dto/access-type.dto';
 
 @Injectable()
 export class AccessesService {
   constructor(
     @InjectRepository(Access)
     private accessRepository: Repository<Access>,
+    @InjectRepository(AccessType)
+    private accessTypeRepository: Repository<AccessType>,
   ) {}
 
   async create(createAccessDto: CreateAccessDto, project: ProjectDto) {
@@ -26,7 +30,40 @@ export class AccessesService {
   }
 
   async findAll(project: ProjectDto) {
-    return await this.accessRepository.find({ where: { project } });
+    return await this.accessRepository.find({
+      where: { project },
+      relations: {
+        type: true,
+      },
+      order: {
+        login: 'ASC',
+      },
+    });
+  }
+
+  async findAllTypes(): Promise<AccessType[]> {
+    return await this.accessTypeRepository.find({
+      order: {
+        title: 'ASC',
+      },
+    });
+  }
+
+  async findTypeById(typeId: AccessTypeDto): Promise<AccessType> {
+    const type = await this.accessTypeRepository.findOne({
+      where: {
+        id: Number(typeId),
+      },
+    });
+
+    if (!type) {
+      throw new HttpException(
+        { error: errorMessage.AccessTypeNotFound },
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    return type;
   }
 
   async findOneById(id: number, user: User) {
@@ -44,7 +81,7 @@ export class AccessesService {
     if (!access) {
       throw new HttpException(
         { error: errorMessage.AccessNotFound },
-        HttpStatus.BAD_REQUEST,
+        HttpStatus.NOT_FOUND,
       );
     }
 
@@ -66,7 +103,7 @@ export class AccessesService {
     if (!password) {
       throw new HttpException(
         { error: errorMessage.PasswordNotFound },
-        HttpStatus.BAD_REQUEST,
+        HttpStatus.NOT_FOUND,
       );
     }
 
@@ -75,6 +112,11 @@ export class AccessesService {
 
   async update(id: number, updateAccessDto: UpdateAccessDto, user: User) {
     await this.findOneById(id, user);
+
+    if (updateAccessDto.type) {
+      await this.findTypeById(updateAccessDto.type);
+    }
+
     await this.accessRepository.update({ id }, updateAccessDto);
     return { message: successMessage.updateAccess };
   }

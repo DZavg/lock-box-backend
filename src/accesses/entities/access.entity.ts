@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { Project } from '../../projects/entities/project.entity';
+import { AccessType } from './access-type.entity';
 
 @Entity('acesses')
 export class Access {
@@ -24,8 +25,10 @@ export class Access {
   @Column()
   password: string;
 
-  @Column()
-  type: string;
+  @ManyToOne(() => AccessType, (type) => type.title, {
+    cascade: true,
+  })
+  type: AccessType;
 
   @Exclude()
   @ManyToOne(() => Project, (project) => project.accesses, {

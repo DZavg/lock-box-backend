@@ -7,10 +7,12 @@ import { UsersModule } from '@/users/users.module';
 import { ConfigModule } from '@nestjs/config';
 import { SessionsModule } from '@/sessions/sessions.module';
 import { TokensModule } from '@/tokens/tokens.module';
+import { AccessType } from '@/accesses/entities/access-type.entity';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Access]),
+    TypeOrmModule.forFeature([AccessType]),
     UsersModule,
     ConfigModule,
     SessionsModule,

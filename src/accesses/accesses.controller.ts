@@ -13,6 +13,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@/auth/auth.guard';
 import { AccessDto } from '@/accesses/dto/access.dto';
 import { UpdateAccessDto } from '@/accesses/dto/update-access.dto';
+import { AccessType } from '@/accesses/entities/access-type.entity';
 
 @ApiTags('Accesses')
 @ApiBearerAuth()
@@ -21,6 +22,11 @@ import { UpdateAccessDto } from '@/accesses/dto/update-access.dto';
 export class AccessesController {
   constructor(private readonly accessesService: AccessesService) {}
 
+  @Get('/types')
+  findAllTypes(): Promise<AccessType[]> {
+    return this.accessesService.findAllTypes();
+  }
+
   @Get(':id')
   findOneById(@Req() req, @Param('id') id: string): Promise<AccessDto> {
     return this.accessesService.findOneById(+id, req.user);
@@ -28,7 +34,6 @@ export class AccessesController {
 
   @Get(':id/password')
   findPasswordById(@Req() req, @Param('id') id: string) {
-    console.log(req);
     return this.accessesService.findPasswordById(+id, req.user);
   }
 

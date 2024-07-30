@@ -10,6 +10,7 @@ export const errorMessage = {
   ProjectNotFound: 'Проект не найден',
   AccessNotFound: 'Доступ не найден',
   PasswordNotFound: 'Пароль не найден',
+  AccessTypeNotFound: 'Данный тип доступа не найден',
   PasswordError: 'Пароль неверный',
   PasswordsMatch: 'Пароли совпадают',
   MailerError: 'Почтовый сервис временно не доступен. Повторите попытку позже',
