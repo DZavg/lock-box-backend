@@ -62,10 +62,7 @@ export class AuthService {
       password: hashedPassword,
     });
 
-    return await this.login({
-      email: recoveryPasswordDto.email,
-      password: recoveryPasswordDto.password,
-    });
+    return { message: successMessage.changePassword };
   }
 
   async refreshToken(req, refreshDto: RefreshDto) {
