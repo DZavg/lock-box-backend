@@ -13,6 +13,7 @@ import { errorMessage } from '@/utils/errorMessage';
 import { ConfigService } from '@nestjs/config';
 import { VerifyCodeDto } from '@/confirmation-codes/dto/verify-code.dto';
 import { TIMEOUT_REQUEST_CODE } from '@/utils/constants';
+import { BadRequestException } from '@/utils/exception/badRequestException';
 
 @Injectable()
 export class ConfirmationCodesService {
@@ -39,7 +40,7 @@ export class ConfirmationCodesService {
     return await this.confirmationCodeRepository.findOne({
       where: {
         code: verifyCodeDto.code,
-        email: verifyCodeDto.email,
+        email: verifyCodeDto.email.toLowerCase(),
       },
     });
   }
@@ -47,7 +48,7 @@ export class ConfirmationCodesService {
   async findOneByEmail(email: string) {
     return await this.confirmationCodeRepository.findOne({
       where: {
-        email,
+        email: email.toLowerCase(),
       },
     });
   }
@@ -55,7 +56,6 @@ export class ConfirmationCodesService {
   async requestCode(requestCodeDto: RequestCodeDto) {
     const code = String(generateFixedLengthNumber(REQUEST_CODE_LENGTH));
     const user = await this.usersService.findOneByEmail(requestCodeDto.email);
-
     if (user) {
       const expiredDate = new Date(
         new Date().getTime() +
@@ -69,22 +69,19 @@ export class ConfirmationCodesService {
           new Date().getTime();
 
       if (checkTimeout) {
-        throw new HttpException(
-          { error: errorMessage.Timeout },
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new BadRequestException({ code: [errorMessage.Timeout] });
       }
 
       await this.saveOrUpdateCode({
         // code,
         code: '000000',
         expiredAt: expiredDate,
-        email: user.email,
+        email: user.email.toLowerCase(),
       });
 
       // await this.mailerService.sendMail({
-      //   to: requestCodeDto.email,
-      //   subject: 'Код подтверждения на сайте example.ru',
+      //   to: requestCodeDto.email.toLowerCase(),
+      //   subject: 'Код подтверждения на сайте dzavg.ru',
       //   text: String(code),
       // });
     }
@@ -95,16 +92,10 @@ export class ConfirmationCodesService {
     const code = await this.findOneByEmailAndCode(verifyCodeDto);
 
     if (!code) {
-      throw new HttpException(
-        { error: errorMessage.IncorrectCode },
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new BadRequestException({ code: [errorMessage.IncorrectCode] });
     }
     if (code?.expiredAt?.getTime() < new Date().getTime()) {
-      throw new HttpException(
-        { error: errorMessage.ExpiredCode },
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new BadRequestException({ code: [errorMessage.ExpiredCode] });
     }
 
     await this.revokeCode(verifyCodeDto);
