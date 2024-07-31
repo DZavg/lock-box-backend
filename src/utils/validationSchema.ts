@@ -16,4 +16,7 @@ export default {
   MAILER_USER: Joi.string().required(),
   MAILER_PASSWORD: Joi.string().required(),
   CONFIRMATION_CODES_EXPIRATION: Joi.number().required(),
+  APP_DOCKER_HOST: Joi.string().required(),
+  APP_DOCKER_PORT: Joi.number().required(),
+  PORT: Joi.number().required(),
 };

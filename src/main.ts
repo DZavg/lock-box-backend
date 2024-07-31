@@ -4,6 +4,7 @@ import { SwaggerModule } from '@nestjs/swagger';
 import swaggerDocs from '@/utils/swaggerDocs';
 import { useContainer } from 'class-validator';
 import validationPipe from '@/utils/validationPipe';
+import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -15,6 +16,7 @@ async function bootstrap() {
 
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
 
-  await app.listen(5001);
+  const config = app.get<ConfigService>(ConfigService);
+  await app.listen(config.get('PORT'));
 }
 bootstrap();
