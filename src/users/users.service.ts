@@ -51,10 +51,9 @@ export class UsersService {
   }
 
   async findOneByEmail(email: string) {
-    email.toLowerCase();
     return await this.usersRepository.findOne({
       select: ['id', 'email', 'password'],
-      where: { email },
+      where: { email: email.toLowerCase() },
     });
   }
 
@@ -122,7 +121,7 @@ export class UsersService {
 
   async updatePassword(updatePasswordDto: UpdatePasswordDto) {
     await this.usersRepository.update(
-      { email: updatePasswordDto.email },
+      { email: updatePasswordDto.email.toLowerCase() },
       { password: updatePasswordDto.password },
     );
   }
