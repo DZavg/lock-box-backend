@@ -14,6 +14,7 @@ import { TokensService } from '@/tokens/tokens.service';
 import { RecoveryPasswordDto } from '@/auth/dto/recovery-password.dto';
 import { ConfirmationCodesService } from '@/confirmation-codes/confirmation-codes.service';
 import { SALT_FOR_PASSWORD } from '@/utils/constants';
+import { demoAccess } from '@/utils/demoAccess';
 
 @Injectable()
 export class AuthService {
@@ -73,5 +74,12 @@ export class AuthService {
     const jwtId = this.tokensService.getJwtId(accessToken);
     await this.sessionService.revokeSession(jwtId);
     return { message: 'success' };
+  }
+
+  async demoAccess() {
+    return this.login({
+      email: demoAccess.email,
+      password: demoAccess.password,
+    });
   }
 }

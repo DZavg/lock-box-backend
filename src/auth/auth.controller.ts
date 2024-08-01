@@ -5,6 +5,7 @@ import {
   UseInterceptors,
   ClassSerializerInterceptor,
   Req,
+  Get,
   UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
@@ -47,5 +48,10 @@ export class AuthController {
   @Post('/logout')
   async logout(@Req() req) {
     return this.authService.logout(req.accessToken);
+  }
+
+  @Get('/demo-access')
+  async demoAccess() {
+    return this.authService.demoAccess();
   }
 }
