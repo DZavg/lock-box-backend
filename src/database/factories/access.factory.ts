@@ -6,7 +6,7 @@ import { AccessType } from '../../accesses/entities/access-type.entity';
 export const AccessFactory = async () => {
   const get = async (project: Project, accessType: AccessType) => {
     const access = new Access();
-    access.origin = faker.internet.domainName();
+    access.origin = faker.internet.url();
     access.login = faker.internet.userName();
     access.type = accessType;
     access.password = faker.internet.password();
