@@ -8,7 +8,7 @@ export class UserSeeder implements Seeder {
   async run(dataSource: DataSource): Promise<any> {
     const usersRepository = dataSource.getRepository(User);
 
-    await usersRepository.insert(await (await UserFactory()).getMany(20));
+    await usersRepository.insert(await (await UserFactory()).getMany(1));
 
     const demoUser = await usersRepository.findOneBy({
       email: demoAccess.email,
