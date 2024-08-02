@@ -9,4 +9,5 @@ export const successMessage = {
   createAccess: 'Доступ успешно создан',
   updateAccess: 'Доступ успешно обновлен',
   deleteAccess: 'Доступ успешно удален',
+  logout: 'Вы успешно вышли из аккаунта',
 };

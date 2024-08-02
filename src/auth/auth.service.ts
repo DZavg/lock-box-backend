@@ -73,7 +73,7 @@ export class AuthService {
   async logout(accessToken: string) {
     const jwtId = this.tokensService.getJwtId(accessToken);
     await this.sessionService.revokeSession(jwtId);
-    return { message: 'success' };
+    return { message: successMessage.logout };
   }
 
   async demoAccess() {
