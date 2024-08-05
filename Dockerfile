@@ -12,7 +12,6 @@ WORKDIR /usr/src/app
 COPY . .
 
 RUN npm run build
-RUN npm run seed
 
 CMD ["npm", "run", "start:prod"]
 
