@@ -9,13 +9,16 @@ export class MailerService {
   private nodemailerTransport: Mail;
 
   constructor(private readonly configService: ConfigService) {
-    this.nodemailerTransport = createTransport({
-      service: configService.get('MAILER_SERVICE'),
+    const smtpConfig = {
+      host: configService.get('MAILER_HOST'),
+      port: configService.get('MAILER_PORT'),
+      secure: true,
       auth: {
         user: configService.get('MAILER_USER'),
         pass: configService.get('MAILER_PASSWORD'),
       },
-    });
+    };
+    this.nodemailerTransport = createTransport(smtpConfig);
   }
 
   async sendMail(options: Mail.Options) {
@@ -25,6 +28,7 @@ export class MailerService {
         ...options,
       });
     } catch (e) {
+      console.log(e);
       throw new HttpException(
         { error: errorMessage.MailerError },
         HttpStatus.BAD_REQUEST,
