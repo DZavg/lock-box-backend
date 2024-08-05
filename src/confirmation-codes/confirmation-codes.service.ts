@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateConfirmationCodeDto } from './dto/create-confirmation-code.dto';
 import generateFixedLengthNumber from '@/utils/generateFixedLengthNumber';
 import { successMessage } from '@/utils/successMessage';
@@ -69,7 +69,10 @@ export class ConfirmationCodesService {
           new Date().getTime();
 
       if (checkTimeout) {
-        throw new BadRequestException({ code: [errorMessage.Timeout] });
+        throw new HttpException(
+          { error: errorMessage.Timeout },
+          HttpStatus.BAD_REQUEST,
+        );
       }
 
       await this.mailerService.sendMail({
