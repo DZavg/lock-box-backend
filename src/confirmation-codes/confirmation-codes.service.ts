@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateConfirmationCodeDto } from './dto/create-confirmation-code.dto';
 import generateFixedLengthNumber from '@/utils/generateFixedLengthNumber';
 import { successMessage } from '@/utils/successMessage';
@@ -72,18 +72,17 @@ export class ConfirmationCodesService {
         throw new BadRequestException({ code: [errorMessage.Timeout] });
       }
 
+      await this.mailerService.sendMail({
+        to: requestCodeDto.email.toLowerCase(),
+        subject: 'Код подтверждения на сайте dzavg.ru',
+        text: String(code),
+      });
+
       await this.saveOrUpdateCode({
-        // code,
-        code: '000000',
+        code,
         expiredAt: expiredDate,
         email: user.email.toLowerCase(),
       });
-
-      // await this.mailerService.sendMail({
-      //   to: requestCodeDto.email.toLowerCase(),
-      //   subject: 'Код подтверждения на сайте dzavg.ru',
-      //   text: String(code),
-      // });
     }
     return { message: successMessage.confirmationCode };
   }
