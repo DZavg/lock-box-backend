@@ -8,7 +8,8 @@ import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.enableCors();
+  const config = app.get<ConfigService>(ConfigService);
+  app.enableCors({ origin: config.get('CORS_ORIGIN') });
   app.useGlobalPipes(validationPipe);
 
   const document = SwaggerModule.createDocument(app, swaggerDocs);
@@ -16,7 +17,6 @@ async function bootstrap() {
 
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
 
-  const config = app.get<ConfigService>(ConfigService);
   await app.listen(config.get('PORT'));
 }
 bootstrap();
