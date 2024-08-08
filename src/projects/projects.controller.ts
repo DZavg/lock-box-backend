@@ -20,6 +20,7 @@ import { AuthGuard } from '@/auth/auth.guard';
 import { ProjectDto } from '@/projects/dto/project.dto';
 import { CreateAccessDto } from '@/accesses/dto/create-access.dto';
 import { ProjectPageDto } from '@/projects/dto/project-page.dto';
+import { ProjectsPageDto } from '@/projects/dto/projects-page.dto';
 
 @ApiTags('Projects')
 @ApiBearerAuth()
@@ -44,7 +45,7 @@ export class ProjectsController {
   }
 
   @Get()
-  findAll(@Req() req, @Query('query') query: string): Promise<ProjectDto[]> {
+  findAll(@Req() req, @Query('query') query: string): Promise<ProjectsPageDto> {
     return this.projectsService.findAll(req.user, query);
   }
 

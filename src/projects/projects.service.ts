@@ -34,7 +34,7 @@ export class ProjectsService {
   }
 
   async findAll(user: User, query: string = '') {
-    return await this.projectRepository.find({
+    const projects = await this.projectRepository.find({
       where: [
         {
           user: { id: user.id },
@@ -49,6 +49,16 @@ export class ProjectsService {
         title: 'ASC',
       },
     });
+
+    const [_allProjects, total_count] =
+      await this.projectRepository.findAndCount({
+        where: { user: { id: user.id } },
+      });
+
+    return {
+      projects,
+      total_count,
+    };
   }
 
   async findAllAccesses(user: User, id: number) {
